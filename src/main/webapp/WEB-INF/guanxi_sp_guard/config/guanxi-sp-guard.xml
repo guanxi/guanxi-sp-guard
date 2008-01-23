@@ -1,0 +1,27 @@
+<Guard xmlns="urn:guanxi:sp">
+  <GuardInfo>
+    <HostName>protectedapp.uni.ac.uk</HostName>
+    <ID>protectedapp-guard</ID>
+    <AttributePrefix>HTTP_</AttributePrefix>
+  </GuardInfo>
+
+  <Cookie>
+    <Domain>.uni.ac.uk</Domain>
+    <Path>/</Path>
+    <Age units="transient" />
+    <Prefix>GUANXI_GUARD_SERVICE_PROVIDER_</Prefix>
+  </Cookie>
+
+  <EngineInfo>
+    <AuthConsumerURL>http://localhost/samlengine/engineAuthCS.gxEngine</AuthConsumerURL>
+    <WAYFLocationService>http://localhost/samlengine/wayfLocation-service.gxEngine</WAYFLocationService>
+    <Timeout>10</Timeout>
+  </EngineInfo>
+
+  <TrustStore>__GUARD_APP_ROOT__/WEB-INF/guanxi_sp_guard/truststore/guard.jks</TrustStore>
+  <TrustStorePassword>changeme</TrustStorePassword>
+
+  <Keystore>__GUARD_APP_ROOT__/WEB-INF/guanxi_sp_guard/keystore/guard.jks</Keystore>
+  <KeystorePassword>changeme</KeystorePassword>
+  <CertificateAlias>webservices</CertificateAlias>
+</Guard>
