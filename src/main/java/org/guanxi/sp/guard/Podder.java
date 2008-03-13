@@ -10,54 +10,9 @@
 //:
 //: The Original Code is Guanxi (http://www.guanxi.uhi.ac.uk).
 //:
-//: The Initial Developer of the Original Code is Alistair Young alistair@smo.uhi.ac.uk.
-//: Portions created by SMO WWW Development Group are Copyright (C) 2005 SMO WWW Development Group.
+//: The Initial Developer of the Original Code is Alistair Young alistair@codebrane.com
 //: All Rights Reserved.
 //:
-/* CVS Header
-   $Id$
-   $Log$
-   Revision 1.1.1.1  2008/01/23 15:28:59  alistairskye
-   Standalone Guard module
-
-   Revision 1.7  2007/01/17 17:39:42  alistairskye
-   Now gets cookie prefix from config
-
-   Revision 1.6  2006/12/14 14:09:27  alistairskye
-   Updated to use Guanxi.CONTEXT_ATTR_GUARD_CONFIG
-
-   Revision 1.5  2006/12/14 12:41:48  alistairskye
-   Updated to make use of config object instead of individual params in context.
-   Now handles all cookie processing.
-
-   Revision 1.4  2006/11/23 14:32:28  alistairskye
-   Updated to redirect using scheme and hostname as it was redirecting to HTTPS if the Guard was using HTTPS
-
-   Revision 1.3  2006/01/16 14:31:01  alistairskye
-   Modified process() to not set MaxAge if the cookie is transient
-
-   Revision 1.2  2005/08/23 15:38:10  alistairskye
-   Cookie name now contains Guard ID to fix reauthentication problem
-
-   Revision 1.1  2005/08/15 14:00:37  alistairskye
-   Links a Pod to a session cookie
-
-   Revision 1.5  2005/08/15 13:42:21  alistairskye
-   Removed decide()
-
-   Revision 1.4  2005/08/15 13:39:06  alistairskye
-   No longer implements PolicyEngine
-
-   Revision 1.3  2005/08/11 15:27:14  alistairskye
-   Now gets the cookie info the the servlet context
-
-   Revision 1.2  2005/08/10 14:54:36  alistairskye
-   Updated license
-
-   Revision 1.1.1.1  2005/08/10 14:19:23  alistairskye
-   Guanxi Service Provider
-
-*/
 
 package org.guanxi.sp.guard;
 

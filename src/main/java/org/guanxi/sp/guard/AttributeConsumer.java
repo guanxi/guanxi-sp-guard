@@ -10,56 +10,9 @@
 //:
 //: The Original Code is Guanxi (http://www.guanxi.uhi.ac.uk).
 //:
-//: The Initial Developer of the Original Code is Alistair Young alistair@smo.uhi.ac.uk.
-//: Portions created by SMO WWW Development Group are Copyright (C) 2005 SMO WWW Development Group.
+//: The Initial Developer of the Original Code is Alistair Young alistair@codebrane.com
 //: All Rights Reserved.
 //:
-/* CVS Header
-   $Id$
-   $Log$
-   Revision 1.1.1.1  2008/01/23 15:28:59  alistairskye
-   Standalone Guard module
-
-   Revision 1.12  2007/03/28 13:53:13  alistairskye
-   Updated process() with bug fix for an attribute with no value.
-
-   Revision 1.11  2007/01/24 10:59:25  alistairskye
-   Updated process() to handle eduPersonScopedAffiliation. Now concatenates the Scope and value for the header.
-
-   Revision 1.10  2007/01/05 20:20:23  alistairskye
-   Fixed bug in process() that threw NPE if no attributes were coming from IdP
-
-   Revision 1.9  2007/01/04 13:49:47  alistairskye
-   Now parses SOAP and SAML Response instead of the Bag.
-   Now adds attributes as convenience objects to the Bag.
-   Now stores raw SAML in the Bag.
-   Updated javadoc.
-
-   Revision 1.8  2006/11/23 15:17:57  alistairskye
-   Updated to use XMLBeans instead of org.guanxi.common.SOAPUtils for working with SOAP messages
-
-   Revision 1.7  2006/07/25 14:22:29  alistairskye
-   Updated to use new Log directory information
-
-   Revision 1.6  2006/01/26 08:56:31  alistairskye
-   Updated to use Logging.DEFAULT_SP_GUARD_CONFIG_FILE
-
-   Revision 1.5  2006/01/21 18:35:47  alistairskye
-   Modified to use Logging.DEFAULT_SP_LOG_DIR
-
-   Revision 1.4  2005/09/22 08:33:15  alistairskye
-   Changed initLogger to use Logging.DEFAULT_IDP_CONFIG_FILE
-
-   Revision 1.3  2005/08/11 14:15:52  alistairskye
-   Associates attributes with a session Pod
-
-   Revision 1.2  2005/08/10 14:54:36  alistairskye
-   Updated license
-
-   Revision 1.1.1.1  2005/08/10 14:19:23  alistairskye
-   Guanxi Service Provider
-
-*/
 
 package org.guanxi.sp.guard;
 

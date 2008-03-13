@@ -1,19 +1,18 @@
-/* CVS Header
-   $Id$
-   $Log$
-   Revision 1.1.1.1  2008/01/23 15:29:00  alistairskye
-   Standalone Guard module
-
-   Revision 1.3  2007/01/08 13:34:04  alistair
-   Updated preHandle() to use latest Guanxi Pod and Bag structure
-
-   Revision 1.2  2006/10/25 14:57:06  alistair
-   Added debug mode to bypass Guanxi cookie
-
-   Revision 1.1  2006/08/30 14:19:34  alistair
-   HandlerInterceptor that uses Guanxi
-
-*/
+//: "The contents of this file are subject to the Mozilla Public License
+//: Version 1.1 (the "License"); you may not use this file except in
+//: compliance with the License. You may obtain a copy of the License at
+//: http://www.mozilla.org/MPL/
+//:
+//: Software distributed under the License is distributed on an "AS IS"
+//: basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+//: License for the specific language governing rights and limitations
+//: under the License.
+//:
+//: The Original Code is Guanxi (http://www.guanxi.uhi.ac.uk).
+//:
+//: The Initial Developer of the Original Code is Alistair Young alistair@codebrane.com
+//: All Rights Reserved.
+//:
 
 package org.guanxi.sp.guard.gateway.spring;
 

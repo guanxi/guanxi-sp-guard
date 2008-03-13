@@ -10,23 +10,9 @@
 //:
 //: The Original Code is Guanxi (http://www.guanxi.uhi.ac.uk).
 //:
-//: The Initial Developer of the Original Code is Alistair Young alistair@smo.uhi.ac.uk.
-//: Portions created by SMO WWW Development Group are Copyright (C) 2005 SMO WWW Development Group.
+//: The Initial Developer of the Original Code is Alistair Young alistair@codebrane.com
 //: All Rights Reserved.
 //:
-/* CVS Header
-   $Id$
-   $Log$
-   Revision 1.1.1.1  2008/01/23 15:28:59  alistairskye
-   Standalone Guard module
-
-   Revision 1.2  2007/02/09 11:42:24  alistairskye
-   Added javadoc
-
-   Revision 1.1  2007/02/09 11:30:49  alistairskye
-   Logout functionality
-
-*/
 
 package org.guanxi.sp.guard;
 

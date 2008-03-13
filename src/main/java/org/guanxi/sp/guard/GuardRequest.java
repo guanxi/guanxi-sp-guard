@@ -10,65 +10,9 @@
 //:
 //: The Original Code is Guanxi (http://www.guanxi.uhi.ac.uk).
 //:
-//: The Initial Developer of the Original Code is Alistair Young alistair@smo.uhi.ac.uk.
-//: Portions created by SMO WWW Development Group are Copyright (C) 2005 SMO WWW Development Group.
+//: The Initial Developer of the Original Code is Alistair Young alistair@codebrane.com
 //: All Rights Reserved.
 //:
-/* CVS Header
-   $Id$
-   $Log$
-   Revision 1.1.1.1  2008/01/23 15:28:59  alistairskye
-   Standalone Guard module
-
-   Revision 1.14  2007/01/04 13:44:31  alistairskye
-   Updated to use new Pod bag methods.
-   Updated javadoc.
-
-   Revision 1.13  2006/08/30 12:22:54  alistairskye
-   Updated to add support for request attributes to fix problems with spring based applications
-
-   Revision 1.12  2006/06/02 08:54:06  alistairskye
-   Updated getHeader() to look for the header name as is before trying all lowercase as the SAML attributes can be mixed case.
-
-   Revision 1.11  2006/05/22 15:26:31  alistairskye
-   Fixed bug where header names were case sensitive. The servlet spec says they should be case insensitive
-
-   Revision 1.10  2006/05/18 13:46:51  alistairskye
-   Fixed bug in getParameter() for when param value is null
-
-   Revision 1.9  2006/05/18 13:32:58  alistairskye
-   Now stores a reference to the Pod
-   Now implements the methods:
-   getParameter
-   getParameterMap
-   getParameterNames
-   getParameterValues
-
-   Revision 1.8  2006/05/18 09:25:48  alistairskye
-   Now gets the request from the Pod
-
-   Revision 1.7  2006/04/05 13:27:41  alistairskye
-   Updated to prefix attributes with configurable prefix string
-
-   Revision 1.6  2005/08/25 15:52:27  alistairskye
-   Added cookies
-
-   Revision 1.5  2005/08/16 13:53:09  alistairskye
-   Prefixes attributes with HTTP_ instead of GUANXI_
-
-   Revision 1.4  2005/08/16 12:17:21  alistairskye
-   Added check for no assertions
-
-   Revision 1.3  2005/08/12 12:46:15  alistairskye
-   Added license
-
-   Revision 1.2  2005/08/12 09:03:32  alistairskye
-   Added SAML attributes
-
-   Revision 1.1  2005/08/11 14:16:49  alistairskye
-   Guanxi specific HttpServletRequest wrapper to handle SAML attributes as request headers
-
-*/
 
 package org.guanxi.sp.guard;
 
