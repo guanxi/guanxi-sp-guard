@@ -13,8 +13,8 @@
   </Cookie>
 
   <EngineInfo>
-    <AuthConsumerURL>http://localhost/samlengine/engineAuthCS.gxEngine</AuthConsumerURL>
-    <WAYFLocationService>http://localhost/samlengine/wayfLocation-service.gxEngine</WAYFLocationService>
+    <AuthConsumerURL>http://localhost/samlengine/shibb/acs</AuthConsumerURL>
+    <WAYFLocationService>http://localhost/samlengine/shibb/wayf-location</WAYFLocationService>
     <Timeout>10</Timeout>
   </EngineInfo>
 
