@@ -14,7 +14,7 @@
       p.print(name + " --> " + value + "<br>");
     }
     p.print("<br /><br /><a href=\"http://localhost:8080/protectedapp/guard.guanxiGuardlogout\">Logout of the SP</a>");
-    p.print("<br /><br /><a href=\"http://localhost:8080/guanxi_idp/logout.gxIdP\">Logout of the IdP</a>");
+    p.print("<br /><br /><a href=\"http://localhost:8080/guanxi_idp/shibb/logout\">Logout of the IdP</a>");
     p.flush();
     p.close();
   %>
