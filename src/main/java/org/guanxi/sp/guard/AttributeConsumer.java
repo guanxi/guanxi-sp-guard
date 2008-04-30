@@ -171,8 +171,8 @@ public class AttributeConsumer extends HttpServlet {
           for (int cc=0; cc < obj.length; cc++) {
             if (attributes[c].getAttributeName().equals(EduPerson.EDUPERSON_SCOPED_AFFILIATION)) {
               String attrValue = obj[cc].getDomNode().getFirstChild().getNodeValue();
-              attrValue += EduPerson.EDUPERSON_SCOPED_AFFILIATION_DELIMITER;
-              attrValue += obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPED_AFFILIATION_SCOPE_ATTRIBUTE).getNodeValue();
+              attrValue += EduPerson.EDUPERSON_SCOPED_DELIMITER;
+              attrValue += obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE).getNodeValue();
               bag.addAttribute(attributes[c].getAttributeName(), attrValue);
             }
             else {
