@@ -365,15 +365,15 @@ public class Guard implements Filter {
    */
   private void initConfigFile(FilterConfig config, GuardDocument configDoc) throws ServletException {
     boolean updated = false;
-    String guardAppRoot = config.getServletContext().getRealPath("WEB-INF").replaceAll(Utils.SLASH + "WEB-INF", "");
-    
+    String guardAppRoot = config.getServletContext().getRealPath("WEB-INF").replace(Utils.SLASH + "WEB-INF", "");
+
     if (configDoc.getGuard().getTrustStore().startsWith("__GUARD_APP_ROOT__")) {
-      configDoc.getGuard().setTrustStore(configDoc.getGuard().getTrustStore().replaceAll("__GUARD_APP_ROOT__", guardAppRoot));
+      configDoc.getGuard().setTrustStore(configDoc.getGuard().getTrustStore().replace("__GUARD_APP_ROOT__", guardAppRoot));
       updated = true;
     }
 
     if (configDoc.getGuard().getKeystore().startsWith("__GUARD_APP_ROOT__")) {
-      configDoc.getGuard().setKeystore(configDoc.getGuard().getKeystore().replaceAll("__GUARD_APP_ROOT__", guardAppRoot));
+      configDoc.getGuard().setKeystore(configDoc.getGuard().getKeystore().replace("__GUARD_APP_ROOT__", guardAppRoot));
       updated = true;
     }
 
