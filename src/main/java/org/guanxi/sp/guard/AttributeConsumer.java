@@ -74,8 +74,9 @@ import java.io.*;
  * If an application requires access to the full SAML Response it can parse the String representation of
  * the raw SAML that the AttributeConsumer services stores in the Bag.
  *
- * @author Alistair Young alistair@smo.uhi.ac.uk
+ * @author Alistair Young alistair@codebrane.com
  * @author Davide Zanatta davide.zanatta@gmail.com - bug fixing
+ * @author Marcin Mielnicki mielniczu@o2.pl - bug fixing
  */
 public class AttributeConsumer extends HttpServlet {
   /** Our logger */
@@ -112,7 +113,8 @@ public class AttributeConsumer extends HttpServlet {
     try {
       // Read the request into a String...
       InputStream in = request.getInputStream();
-      BufferedReader buffer = new BufferedReader(new InputStreamReader(in));
+      //BufferedReader buffer = new BufferedReader(new InputStreamReader(in));
+      BufferedReader buffer = new BufferedReader(new InputStreamReader(in, "UTF-8"));
       StringBuffer stringBuffer = new StringBuffer();
       String line = null;
       while ((line = buffer.readLine()) != null) {
