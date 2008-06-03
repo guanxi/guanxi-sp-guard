@@ -197,7 +197,7 @@ public class Guard implements Filter {
     }
 
     // This is the session ID that we'll use to track the request
-    String sessionID = "GUARD_" + Utils.getUniqueID();
+    String sessionID = "GUARD_" + Utils.getUniqueID().replaceAll(":", "--");
 
     // Create a new Pod to encapsulate information for this session
     Pod pod = new Pod();
