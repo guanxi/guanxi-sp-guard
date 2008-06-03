@@ -2,7 +2,7 @@
 <%@ page import="java.util.ResourceBundle"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-  ResourceBundle msg = ResourceBundle.getBundle("messages.sp", new Locale(request.getHeader("Accept-Language")));
+  ResourceBundle msg = ResourceBundle.getBundle("messages.sp", request.getLocale());
 %>
 <html>
   <head><title><%= msg.getString("guard.logout.page.title")%></title>

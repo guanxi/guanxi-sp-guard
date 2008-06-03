@@ -2,8 +2,8 @@
 <%@ page import="java.util.Locale"%>
 <%@ page import="java.io.File"%>
 <%
-  ResourceBundle msg = ResourceBundle.getBundle("messages.sp_index", new Locale(request.getHeader("Accept-Language")));
-  ResourceBundle siteMsg = ResourceBundle.getBundle("messages.site", new Locale(request.getHeader("Accept-Language")));
+  ResourceBundle msg = ResourceBundle.getBundle("messages.sp_index", request.getLocale());
+  ResourceBundle siteMsg = ResourceBundle.getBundle("messages.site", request.getLocale());
 %>
 <html>
   <head>
