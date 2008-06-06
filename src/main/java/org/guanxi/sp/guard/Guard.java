@@ -314,7 +314,7 @@ public class Guard implements Filter {
     // The target parameter is meant to come back as is from the IdP
     wayfLocation += "?shire=" + config.getEngineInfo().getAuthConsumerURL();
     wayfLocation += "&target=" + sessionID;
-    wayfLocation += "&time=" + Utils.zuluNow();
+    wayfLocation += "&time=" + (System.currentTimeMillis() / 1000);
     wayfLocation += "&providerId=" + config.getGuardInfo().getID();
 
     // Send the user to the WAYF or IdP
