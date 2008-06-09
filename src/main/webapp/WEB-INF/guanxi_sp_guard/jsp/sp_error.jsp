@@ -16,7 +16,7 @@
         margin-right: 20px;
         margin-bottom: 20px;
         font-family:Verdana, Arial, Helvetica, sans-serif;
-        background-image: url(<%= request.getContextPath() %> /guanxi_sp/images/watermark.gif );
+        background-image: url(<%= request.getContextPath() %>/guanxi_sp/images/watermark.gif );
       }
       -->
     </style>
