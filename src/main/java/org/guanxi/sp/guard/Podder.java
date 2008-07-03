@@ -40,7 +40,7 @@ import java.io.IOException;
  */
 public class Podder extends HttpServlet {
   /** Our logger */
-  private static Logger log = Logger.getLogger(Guard.class);
+  private static Logger log = Logger.getLogger(Podder.class);
   /** The config object placed in the servlet context by the Guard filter */
   private org.guanxi.xal.sp.GuardDocument.Guard config = null;
   /** The age of the cookie to set */
