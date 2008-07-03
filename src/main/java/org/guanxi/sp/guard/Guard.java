@@ -179,6 +179,7 @@ public class Guard implements Filter {
     boolean foundPod = false;
     if (cookies != null) {
       for (int i=0; i<cookies.length; i++) {
+        log.debug("Found cookie : " + cookies[i].getName());
         if (cookies[i].getName().equals(config.getCookie().getPrefix() + config.getGuardInfo().getID())) {
           // See if there's a pod for the request
           Pod pod = (Pod)filterConfig.getServletContext().getAttribute(cookies[i].getValue());
