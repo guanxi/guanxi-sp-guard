@@ -17,13 +17,20 @@
 package org.guanxi.sp.guard;
 
 import org.guanxi.common.Pod;
+import org.guanxi.common.GuanxiException;
 import org.guanxi.common.definitions.Guanxi;
+import org.guanxi.common.definitions.Logging;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.RollingFileAppender;
+import org.apache.log4j.xml.DOMConfigurator;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.ServletException;
+import javax.servlet.ServletContext;
 import java.io.IOException;
 
 /**
@@ -32,12 +39,22 @@ import java.io.IOException;
  * @author Alistair Young alistair@smo.uhi.ac.uk
  */
 public class Podder extends HttpServlet {
+  /** Our logger */
+  private static Logger log = Logger.getLogger(Guard.class);
   /** The config object placed in the servlet context by the Guard filter */
   private org.guanxi.xal.sp.GuardDocument.Guard config = null;
   /** The age of the cookie to set */
   private int cookieAge;
 
   public void init() throws ServletException {
+    // Get the logger ready
+    try {
+      initLogger(getServletContext());
+    }
+    catch(GuanxiException ge) {
+      System.err.println("Podder can't log : " + ge.getMessage());
+    }
+
     // Get the config
     config = (org.guanxi.xal.sp.GuardDocument.Guard)getServletContext().getAttribute(Guanxi.CONTEXT_ATTR_GUARD_CONFIG);
 
@@ -90,6 +107,7 @@ public class Podder extends HttpServlet {
     Pod pod = (Pod)getServletContext().getAttribute(request.getParameter("id"));
 
     // Create a new Guard cookie
+    log.debug("Creating a new Guard cookie : " + config.getCookie().getPrefix() + config.getGuardInfo().getID());
     Cookie cookie = new Cookie(config.getCookie().getPrefix() + config.getGuardInfo().getID(), pod.getSessionID());
     cookie.setDomain(cookieDomain);
     cookie.setPath(config.getCookie().getPath());
@@ -103,5 +121,27 @@ public class Podder extends HttpServlet {
 
     // Redirect to the requested resource. The filter will handle access and attributes
     response.sendRedirect(pod.getRequestScheme() + "://" + pod.getHostName() + pod.getRequestURL());
+  }
+
+  private void initLogger(ServletContext context) throws GuanxiException {
+    DOMConfigurator.configure(context.getRealPath(Logging.DEFAULT_SP_GUARD_CONFIG_FILE));
+
+    PatternLayout defaultLayout = new PatternLayout(Logging.DEFAULT_LAYOUT);
+
+    RollingFileAppender rollingFileAppender = new RollingFileAppender();
+    rollingFileAppender.setName("GuanxiGuardPodder");
+    try {
+      rollingFileAppender.setFile(context.getRealPath(Logging.DEFAULT_SP_GUARD_LOG_DIR + "guanxi-sp-guard-podder.log"), true, false, 0);
+    }
+    catch(IOException ioe) {
+      throw new GuanxiException(ioe);
+    }
+    rollingFileAppender.setMaxFileSize("1MB");
+    rollingFileAppender.setMaxBackupIndex(5);
+    rollingFileAppender.setLayout(defaultLayout);
+
+    log.removeAllAppenders();
+    log.addAppender(rollingFileAppender);
+    log.setAdditivity(false);
   }
 }
