@@ -173,7 +173,10 @@ public class Guard implements Filter {
       return;
     }
 
+    log.debug("Looking for Guard cookie with name : " + config.getCookie().getPrefix() + config.getGuardInfo().getID());
+
     Cookie[] cookies = httpRequest.getCookies();
+    boolean foundPod = false;
     if (cookies != null) {
       for (int i=0; i<cookies.length; i++) {
         if (cookies[i].getName().equals(config.getCookie().getPrefix() + config.getGuardInfo().getID())) {
@@ -182,10 +185,14 @@ public class Guard implements Filter {
 
           // If there isn't then we must get rid of the cookie
           if (pod == null) {
+            log.debug("Found a Guard cookie but no Pod of attributes : " + cookies[i].getName());
             cookies[i].setMaxAge(0);
             httpResponse.addCookie(cookies[i]);
           }
           else {
+            log.debug("Found a Guard cookie with a Pod of attributes : " + cookies[i].getName());
+            foundPod = true;
+            
             // Add any new parameters to the original request
             pod.setRequestParameters(request.getParameterMap());
 
@@ -194,6 +201,10 @@ public class Guard implements Filter {
           }
         }
       }
+    }
+
+    if (!foundPod) {
+      log.debug("No pod of attributes found - redirecting to the WAYF");
     }
 
     // This is the session ID that we'll use to track the request
