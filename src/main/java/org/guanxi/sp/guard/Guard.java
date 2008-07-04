@@ -78,9 +78,10 @@ public class Guard implements Filter {
 
       // Sort out any config options that can be done automatically
       initConfigFile(config, guardDoc);
-      
+
       // Make the config available to the rest of the Guard as an XMLBeans Guard object
-      filterConfig.getServletContext().setAttribute(Guanxi.CONTEXT_ATTR_GUARD_CONFIG, guardDoc.getGuard());
+      filterConfig.getServletContext().setAttribute(Guanxi.CONTEXT_ATTR_GUARD_CONFIG,
+                                                    guardDoc.getGuard());
 
       /* Register our ID and cookie details in the servlet context
        * to allow applications to know who their Guard is.
@@ -90,8 +91,7 @@ public class Guard implements Filter {
       filterConfig.getServletContext().setAttribute(Guanxi.CONTEXT_ATTR_GUARD_COOKIE_PREFIX,
                                                     guardDoc.getGuard().getCookie().getPrefix());
       filterConfig.getServletContext().setAttribute(Guanxi.CONTEXT_ATTR_GUARD_COOKIE_NAME,
-                                                    guardDoc.getGuard().getCookie().getPrefix() +
-                                                    guardDoc.getGuard().getGuardInfo().getID());
+                                                    guardDoc.getGuard().getCookie().getPrefix() + guardDoc.getGuard().getGuardInfo().getID());
 
       /* If we don't have a keystore, create a self signed one now. The keystore will hold
        * our private key and public key certificate in case we need to communicate with an
@@ -107,8 +107,9 @@ public class Guard implements Filter {
                                             guardDoc.getGuard().getKeystorePassword(),
                                             guardDoc.getGuard().getGuardInfo().getID()); // alias for certificate
         }
-        catch(GuanxiException ge) {
-          log.error("Can't create self signed keystore - secure Engine comms won't be available : ", ge);
+        catch (GuanxiException ge) {
+          log.error("Can't create self signed keystore - secure Engine comms won't be available : ",
+                    ge);
           throw new ServletException(ge);
         }
       }
@@ -121,13 +122,14 @@ public class Guard implements Filter {
           secUtils.createTrustStore(guardDoc.getGuard().getTrustStore(),
                                     guardDoc.getGuard().getTrustStorePassword());
         }
-        catch(GuanxiException ge) {
-          log.error("Can't create truststore - secure Engine comms won't be available : ", ge);
+        catch (GuanxiException ge) {
+          log.error("Can't create truststore - secure Engine comms won't be available : ",
+                    ge);
           throw new ServletException(ge);
         }
       }
     }
-    catch(Exception e) {
+    catch (Exception e) {
       log.error("Guard init failure", e);
       throw new ServletException(e);
     }
@@ -143,13 +145,13 @@ public class Guard implements Filter {
        * invalidating the ID we got from addProvider().
        */
       try {
-        for (int i=0; i < providers.length; i++) {
+        for (int i = 0; i < providers.length; i++) {
           if (providers[i].getName().equalsIgnoreCase(Guanxi.BOUNCY_CASTLE_PROVIDER_NAME)) {
             Security.removeProvider(Guanxi.BOUNCY_CASTLE_PROVIDER_NAME);
           }
         }
       }
-      catch(SecurityException se) {
+      catch (SecurityException se) {
         /* We'll end up here if a security manager is installed and it refuses us
          * permission to remove the BouncyCastle provider
          */
@@ -157,30 +159,29 @@ public class Guard implements Filter {
     }
   }
 
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+  public void doFilter(ServletRequest request, ServletResponse response,
+      FilterChain filterChain) throws IOException, ServletException {
     HttpServletRequest httpRequest = (HttpServletRequest)request;
     HttpServletResponse httpResponse = (HttpServletResponse)response;
 
     // Get the config
     org.guanxi.xal.sp.GuardDocument.Guard config = (org.guanxi.xal.sp.GuardDocument.Guard)filterConfig.getServletContext().getAttribute(Guanxi.CONTEXT_ATTR_GUARD_CONFIG);
-
+    String cookieName = config.getCookie().getPrefix() + Utils.escapeEntityID(config.getGuardInfo().getID());
+    
     // Don't block web service calls from a Guanxi SAML Engine
-    if ((httpRequest.getRequestURI().endsWith("guard.sessionVerifier")) ||
-        (httpRequest.getRequestURI().endsWith("guard.guanxiGuardACS")) ||
-        (httpRequest.getRequestURI().endsWith("guard.guanxiGuardlogout")) ||
-        (httpRequest.getRequestURI().endsWith("guard.guanxiGuardPodder"))) {
+    if ((httpRequest.getRequestURI().endsWith("guard.sessionVerifier")) || (httpRequest.getRequestURI().endsWith("guard.guanxiGuardACS")) || (httpRequest.getRequestURI().endsWith("guard.guanxiGuardlogout")) || (httpRequest.getRequestURI().endsWith("guard.guanxiGuardPodder"))) {
       filterChain.doFilter(request, response);
       return;
     }
 
-    log.debug("Looking for Guard cookie with name : " + config.getCookie().getPrefix() + config.getGuardInfo().getID());
+    log.debug("Looking for Guard cookie with name : " + cookieName);
 
     Cookie[] cookies = httpRequest.getCookies();
     boolean foundPod = false;
     if (cookies != null) {
-      for (int i=0; i<cookies.length; i++) {
+      for (int i = 0; i < cookies.length; i++) {
         log.debug("Found cookie : " + cookies[i].getName());
-        if (cookies[i].getName().equals(config.getCookie().getPrefix() + config.getGuardInfo().getID())) {
+        if (cookies[i].getName().equals(cookieName)) {
           // See if there's a pod for the request
           Pod pod = (Pod)filterConfig.getServletContext().getAttribute(cookies[i].getValue());
 
@@ -193,11 +194,14 @@ public class Guard implements Filter {
           else {
             log.debug("Found a Guard cookie with a Pod of attributes : " + cookies[i].getName());
             foundPod = true;
-            
+
             // Add any new parameters to the original request
             pod.setRequestParameters(request.getParameterMap());
 
-            filterChain.doFilter(new GuardRequest(httpRequest, pod, config.getGuardInfo().getAttributePrefix()), response);
+            filterChain.doFilter(new GuardRequest(httpRequest,
+                                                  pod,
+                                                  config.getGuardInfo().getAttributePrefix()),
+                                 response);
             return;
           }
         }
@@ -231,7 +235,7 @@ public class Guard implements Filter {
     if (httpRequest.getQueryString() != null)
       pod.setRequestURL(httpRequest.getRequestURI() + "?" + httpRequest.getQueryString());
     else
-     pod.setRequestURL(httpRequest.getRequestURI());
+      pod.setRequestURL(httpRequest.getRequestURI());
 
     // Store the Pod in a session
     pod.setSessionID(sessionID);
@@ -260,26 +264,30 @@ public class Guard implements Filter {
           guardTrustStore.load(new FileInputStream(config.getTrustStore()),
                                config.getTrustStorePassword().toCharArray());
           // ...under it's Subject DN as an alias...
-          guardTrustStore.setCertificateEntry(engineX509.getSubjectDN().getName(), engineX509);
+          guardTrustStore.setCertificateEntry(engineX509.getSubjectDN().getName(),
+                                              engineX509);
           // ...and rewrite the trust store
           guardTrustStore.store(new FileOutputStream(config.getTrustStore()),
                                 config.getTrustStorePassword().toCharArray());
 
           // Mark the Engine as having been checked for secure comms
-          filterConfig.getServletContext().setAttribute(config.getGuardInfo().getID() + "SECURE_CHECK_DONE", "SECURE");
+          filterConfig.getServletContext().setAttribute(config.getGuardInfo().getID() + "SECURE_CHECK_DONE",
+                                                        "SECURE");
 
           log.info("Added : " + engineX509.getSubjectDN().getName() + " to truststore");
         }
         else {
           // Mark Guard as having been checked for secure comms
-          filterConfig.getServletContext().setAttribute(config.getGuardInfo().getID() + "SECURE_CHECK_DONE", "NOT_SECURE");
+          filterConfig.getServletContext().setAttribute(config.getGuardInfo().getID() + "SECURE_CHECK_DONE",
+                                                        "NOT_SECURE");
         }
       }
-      catch(Exception e) {
+      catch (Exception e) {
         log.error("Secure probe to Engine failed", e);
         request.setAttribute("ERROR_ID", "ID_WAYF_WS_NOT_RESPONDING");
         request.setAttribute("ERROR_MESSAGE", e.getMessage());
-        request.getRequestDispatcher("/WEB-INF/guanxi_sp_guard/jsp/sp_error.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/guanxi_sp_guard/jsp/sp_error.jsp").forward(request,
+                                                                                          response);
         return;
       }
     }
@@ -289,8 +297,7 @@ public class Guard implements Filter {
      */
     String wayfLocation = null;
     try {
-      String queryString = config.getEngineInfo().getWAYFLocationService() + "?" +
-                           Guanxi.WAYF_PARAM_GUARD_ID + "=" + config.getGuardInfo().getID();
+      String queryString = config.getEngineInfo().getWAYFLocationService() + "?" + Guanxi.WAYF_PARAM_GUARD_ID + "=" + config.getGuardInfo().getID();
       queryString += "&" + Guanxi.WAYF_PARAM_SESSION_ID + "=" + sessionID;
       EntityConnection wayfService = new EntityConnection(queryString,
                                                           config.getGuardInfo().getID(),
@@ -305,11 +312,12 @@ public class Guard implements Filter {
       if (wayfLocation.equals(Guanxi.SESSION_VERIFIER_RETURN_VERIFIED)) {
       }
     }
-    catch(Exception e) {
+    catch (Exception e) {
       log.error("Engine WAYF Web Service not responding", e);
       request.setAttribute("ERROR_ID", "ID_WAYF_WS_NOT_RESPONDING");
       request.setAttribute("ERROR_MESSAGE", e.getMessage());
-      request.getRequestDispatcher("/WEB-INF/guanxi_sp_guard/jsp/sp_error.jsp").forward(request, response);
+      request.getRequestDispatcher("/WEB-INF/guanxi_sp_guard/jsp/sp_error.jsp").forward(request,
+                                                                                        response);
       return;
     }
 
@@ -317,7 +325,8 @@ public class Guard implements Filter {
       log.error("Engine WAYF Web Service returned error : " + wayfLocation);
       request.setAttribute("ERROR_ID", "ID_WAYF_WS_ERROR");
       request.setAttribute("ERROR_MESSAGE", wayfLocation);
-      request.getRequestDispatcher("/WEB-INF/guanxi_sp_guard/jsp/sp_error.jsp").forward(request, response);
+      request.getRequestDispatcher("/WEB-INF/guanxi_sp_guard/jsp/sp_error.jsp").forward(request,
+                                                                                        response);
       return;
     }
 
@@ -354,9 +363,12 @@ public class Guard implements Filter {
     RollingFileAppender rollingFileAppender = new RollingFileAppender();
     rollingFileAppender.setName("GuanxiGuard");
     try {
-      rollingFileAppender.setFile(context.getRealPath(Logging.DEFAULT_SP_GUARD_LOG_DIR + "guanxi-sp-guard.log"), true, false, 0);
+      rollingFileAppender.setFile(context.getRealPath(Logging.DEFAULT_SP_GUARD_LOG_DIR + "guanxi-sp-guard.log"),
+                                  true,
+                                  false,
+                                  0);
     }
-    catch(IOException ioe) {
+    catch (IOException ioe) {
       throw new GuanxiException(ioe);
     }
     rollingFileAppender.setMaxFileSize("1MB");
@@ -377,15 +389,18 @@ public class Guard implements Filter {
    */
   private void initConfigFile(FilterConfig config, GuardDocument configDoc) throws ServletException {
     boolean updated = false;
-    String guardAppRoot = config.getServletContext().getRealPath("WEB-INF").replace(Utils.SLASH + "WEB-INF", "");
+    String guardAppRoot = config.getServletContext().getRealPath("WEB-INF").replace(Utils.SLASH + "WEB-INF",
+                                                                                    "");
 
     if (configDoc.getGuard().getTrustStore().startsWith("__GUARD_APP_ROOT__")) {
-      configDoc.getGuard().setTrustStore(configDoc.getGuard().getTrustStore().replace("__GUARD_APP_ROOT__", guardAppRoot));
+      configDoc.getGuard().setTrustStore(configDoc.getGuard().getTrustStore().replace("__GUARD_APP_ROOT__",
+                                                                                      guardAppRoot));
       updated = true;
     }
 
     if (configDoc.getGuard().getKeystore().startsWith("__GUARD_APP_ROOT__")) {
-      configDoc.getGuard().setKeystore(configDoc.getGuard().getKeystore().replace("__GUARD_APP_ROOT__", guardAppRoot));
+      configDoc.getGuard().setKeystore(configDoc.getGuard().getKeystore().replace("__GUARD_APP_ROOT__",
+                                                                                  guardAppRoot));
       updated = true;
     }
 
@@ -396,9 +411,10 @@ public class Guard implements Filter {
       xmlOptions.setUseDefaultNamespace();
 
       try {
-        configDoc.save(new File(config.getServletContext().getRealPath(config.getInitParameter(CONFIG_FILE_PARAM))), xmlOptions);
+        configDoc.save(new File(config.getServletContext().getRealPath(config.getInitParameter(CONFIG_FILE_PARAM))),
+                       xmlOptions);
       }
-      catch(IOException ioe) {
+      catch (IOException ioe) {
         throw new ServletException(ioe);
       }
     }
