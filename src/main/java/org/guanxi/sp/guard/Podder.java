@@ -18,6 +18,7 @@ package org.guanxi.sp.guard;
 
 import org.guanxi.common.Pod;
 import org.guanxi.common.GuanxiException;
+import org.guanxi.common.Utils;
 import org.guanxi.common.definitions.Guanxi;
 import org.guanxi.common.definitions.Logging;
 import org.apache.log4j.Logger;
@@ -51,7 +52,7 @@ public class Podder extends HttpServlet {
     try {
       initLogger(getServletContext());
     }
-    catch(GuanxiException ge) {
+    catch (GuanxiException ge) {
       System.err.println("Podder can't log : " + ge.getMessage());
     }
 
@@ -64,14 +65,22 @@ public class Podder extends HttpServlet {
     // Sort out the cookie's age
     String cookieMaxAge = config.getCookie().getAge().getStringValue();
     String cookieAgeUnits = config.getCookie().getAge().getUnits().toString();
-    if (cookieAgeUnits.equals("seconds")) cookieAge = Integer.parseInt(cookieMaxAge);
-    else if (cookieAgeUnits.equals("minutes")) cookieAge = Integer.parseInt(cookieMaxAge) * 60;
-    else if (cookieAgeUnits.equals("hours")) cookieAge = Integer.parseInt(cookieMaxAge) * 3600;
-    else if (cookieAgeUnits.equals("days")) cookieAge = Integer.parseInt(cookieMaxAge) * 86400;
-    else if (cookieAgeUnits.equals("weeks")) cookieAge = Integer.parseInt(cookieMaxAge) * 604800;
-    else if (cookieAgeUnits.equals("months")) cookieAge = Integer.parseInt(cookieMaxAge) * 2419200;
-    else if (cookieAgeUnits.equals("years")) cookieAge = Integer.parseInt(cookieMaxAge) * 29030400;
-    else if (cookieAgeUnits.equals("transient")) cookieAge = -1;
+    if (cookieAgeUnits.equals("seconds"))
+      cookieAge = Integer.parseInt(cookieMaxAge);
+    else if (cookieAgeUnits.equals("minutes"))
+      cookieAge = Integer.parseInt(cookieMaxAge) * 60;
+    else if (cookieAgeUnits.equals("hours"))
+      cookieAge = Integer.parseInt(cookieMaxAge) * 3600;
+    else if (cookieAgeUnits.equals("days"))
+      cookieAge = Integer.parseInt(cookieMaxAge) * 86400;
+    else if (cookieAgeUnits.equals("weeks"))
+      cookieAge = Integer.parseInt(cookieMaxAge) * 604800;
+    else if (cookieAgeUnits.equals("months"))
+      cookieAge = Integer.parseInt(cookieMaxAge) * 2419200;
+    else if (cookieAgeUnits.equals("years"))
+      cookieAge = Integer.parseInt(cookieMaxAge) * 29030400;
+    else if (cookieAgeUnits.equals("transient"))
+      cookieAge = -1;
   }
 
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -102,13 +111,16 @@ public class Podder extends HttpServlet {
   public void process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     // Sort out the cookie path
     String cookieDomain = (config.getCookie().getDomain() == null) ? "" : config.getCookie().getDomain();
+    
+    String cookieName = config.getCookie().getPrefix() + Utils.escapeEntityID(config.getGuardInfo().getID());
 
     // "id" is the sessionID set by the Guard filter
     Pod pod = (Pod)getServletContext().getAttribute(request.getParameter("id"));
 
     // Create a new Guard cookie
-    log.debug("Creating a new Guard cookie : " + config.getCookie().getPrefix() + config.getGuardInfo().getID());
-    Cookie cookie = new Cookie(config.getCookie().getPrefix() + config.getGuardInfo().getID(), pod.getSessionID());
+    log.debug("Creating a new Guard cookie : " + cookieName);
+    Cookie cookie = new Cookie(cookieName,
+                               pod.getSessionID());
     cookie.setDomain(cookieDomain);
     cookie.setPath(config.getCookie().getPath());
 
@@ -131,9 +143,12 @@ public class Podder extends HttpServlet {
     RollingFileAppender rollingFileAppender = new RollingFileAppender();
     rollingFileAppender.setName("GuanxiGuardPodder");
     try {
-      rollingFileAppender.setFile(context.getRealPath(Logging.DEFAULT_SP_GUARD_LOG_DIR + "guanxi-sp-guard-podder.log"), true, false, 0);
+      rollingFileAppender.setFile(context.getRealPath(Logging.DEFAULT_SP_GUARD_LOG_DIR + "guanxi-sp-guard-podder.log"),
+                                  true,
+                                  false,
+                                  0);
     }
-    catch(IOException ioe) {
+    catch (IOException ioe) {
       throw new GuanxiException(ioe);
     }
     rollingFileAppender.setMaxFileSize("1MB");
