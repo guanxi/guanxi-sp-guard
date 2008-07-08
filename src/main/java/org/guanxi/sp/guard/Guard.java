@@ -389,7 +389,7 @@ public class Guard implements Filter {
    */
   private void initConfigFile(FilterConfig config, GuardDocument configDoc) throws ServletException {
     boolean updated = false;
-    String guardAppRoot = config.getServletContext().getRealPath("WEB-INF").replace(Utils.SLASH + "WEB-INF",
+    String guardAppRoot = config.getServletContext().getRealPath("WEB-INF").replace(File.separator + "WEB-INF",
                                                                                     "");
 
     if (configDoc.getGuard().getTrustStore().startsWith("__GUARD_APP_ROOT__")) {
