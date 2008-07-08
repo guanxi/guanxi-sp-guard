@@ -18,6 +18,7 @@ package org.guanxi.sp.guard;
 
 import org.guanxi.common.definitions.Guanxi;
 import org.guanxi.common.definitions.Logging;
+import org.guanxi.common.filters.FileName;
 import org.guanxi.common.*;
 import org.guanxi.common.security.SecUtils;
 import org.guanxi.xal.sp.GuardDocument;
@@ -166,7 +167,7 @@ public class Guard implements Filter {
 
     // Get the config
     org.guanxi.xal.sp.GuardDocument.Guard config = (org.guanxi.xal.sp.GuardDocument.Guard)filterConfig.getServletContext().getAttribute(Guanxi.CONTEXT_ATTR_GUARD_CONFIG);
-    String cookieName = config.getCookie().getPrefix() + Utils.escapeEntityID(config.getGuardInfo().getID());
+    String cookieName = config.getCookie().getPrefix() + FileName.encode(config.getGuardInfo().getID());
     
     // Don't block web service calls from a Guanxi SAML Engine
     if ((httpRequest.getRequestURI().endsWith("guard.sessionVerifier")) || (httpRequest.getRequestURI().endsWith("guard.guanxiGuardACS")) || (httpRequest.getRequestURI().endsWith("guard.guanxiGuardlogout")) || (httpRequest.getRequestURI().endsWith("guard.guanxiGuardPodder"))) {

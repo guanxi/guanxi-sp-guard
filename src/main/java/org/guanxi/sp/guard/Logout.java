@@ -19,6 +19,8 @@ package org.guanxi.sp.guard;
 import org.guanxi.common.Pod;
 import org.guanxi.common.Utils;
 import org.guanxi.common.definitions.Guanxi;
+import org.guanxi.common.filters.FileName;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -58,7 +60,7 @@ public class Logout extends HttpServlet {
    */
   public void processLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     org.guanxi.xal.sp.GuardDocument.Guard config = (org.guanxi.xal.sp.GuardDocument.Guard)getServletContext().getAttribute(Guanxi.CONTEXT_ATTR_GUARD_CONFIG);
-    String cookieName = config.getCookie().getPrefix() + Utils.escapeEntityID(config.getGuardInfo().getID());
+    String cookieName = config.getCookie().getPrefix() + FileName.encode(config.getGuardInfo().getID());
     
     boolean loggedOut = false;
     Cookie[] cookies = request.getCookies();

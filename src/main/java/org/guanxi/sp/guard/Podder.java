@@ -18,9 +18,9 @@ package org.guanxi.sp.guard;
 
 import org.guanxi.common.Pod;
 import org.guanxi.common.GuanxiException;
-import org.guanxi.common.Utils;
 import org.guanxi.common.definitions.Guanxi;
 import org.guanxi.common.definitions.Logging;
+import org.guanxi.common.filters.FileName;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.RollingFileAppender;
@@ -112,7 +112,7 @@ public class Podder extends HttpServlet {
     // Sort out the cookie path
     String cookieDomain = (config.getCookie().getDomain() == null) ? "" : config.getCookie().getDomain();
     
-    String cookieName = config.getCookie().getPrefix() + Utils.escapeEntityID(config.getGuardInfo().getID());
+    String cookieName = config.getCookie().getPrefix() + FileName.encode(config.getGuardInfo().getID());
 
     // "id" is the sessionID set by the Guard filter
     Pod pod = (Pod)getServletContext().getAttribute(request.getParameter("id"));
