@@ -31,6 +31,7 @@ import java.io.PrintWriter;
  *
  * @author Alistair Young
  */
+@SuppressWarnings("serial")
 public class SessionVerifier extends HttpServlet {
   public void init() throws ServletException {
   }

@@ -78,6 +78,7 @@ import java.io.*;
  * @author Davide Zanatta davide.zanatta@gmail.com - bug fixing
  * @author Marcin Mielnicki mielniczu@o2.pl - bug fixing
  */
+@SuppressWarnings("serial")
 public class AttributeConsumer extends HttpServlet {
   /** Our logger */
   private static Logger log = Logger.getLogger(AttributeConsumer.class);

@@ -17,7 +17,6 @@
 package org.guanxi.sp.guard;
 
 import org.guanxi.common.Pod;
-import org.guanxi.common.Utils;
 import org.guanxi.common.definitions.Guanxi;
 import org.guanxi.common.filters.FileName;
 
@@ -36,6 +35,7 @@ import java.io.IOException;
  *
  * @author Alistair Young alistair@smo.uhi.ac.uk
  */
+@SuppressWarnings("serial")
 public class Logout extends HttpServlet {
   public void init() throws ServletException {
   }
