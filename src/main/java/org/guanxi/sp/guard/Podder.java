@@ -39,6 +39,7 @@ import java.io.IOException;
  *
  * @author Alistair Young alistair@smo.uhi.ac.uk
  */
+@SuppressWarnings("serial")
 public class Podder extends HttpServlet {
   /** Our logger */
   private static Logger log = Logger.getLogger(Podder.class);

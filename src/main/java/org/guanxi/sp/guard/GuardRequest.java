@@ -30,21 +30,22 @@ import java.util.*;
  */
 public class GuardRequest extends HttpServletRequestWrapper {
   Pod requestPod = null;
-  Hashtable headers = null;
+  Hashtable<String, String> headers = null;
   Cookie[] cookies = null;
 
+  @SuppressWarnings("unchecked")
   public GuardRequest(HttpServletRequest request, Pod pod, String attributePrefix) {
     super(request);
 
     requestPod = pod;
 
-    headers = new Hashtable();
+    headers = new Hashtable<String, String>();
 
     cookies = new Cookie[super.getCookies().length];
     cookies = super.getCookies();
 
     String buffer = null;
-    Enumeration requestHeaderNames = super.getHeaderNames();
+    Enumeration<String> requestHeaderNames = super.getHeaderNames();
     while (requestHeaderNames.hasMoreElements()) {
       buffer = (String)requestHeaderNames.nextElement();
       // Servlet spec states that header names are case insensitive
@@ -53,7 +54,7 @@ public class GuardRequest extends HttpServletRequestWrapper {
 
     // Make sure there are attributes to process
     if (pod.getBag().hasAttributes()) {
-      Enumeration samlAttributeNames = pod.getBag().getAttributeNames();
+      Enumeration<String> samlAttributeNames = pod.getBag().getAttributeNames();
       while (samlAttributeNames.hasMoreElements()) {
         buffer = (String)samlAttributeNames.nextElement();
         headers.put(attributePrefix + buffer, pod.getBag().getAttributeValue(buffer));
@@ -72,13 +73,13 @@ public class GuardRequest extends HttpServletRequestWrapper {
     return (values != null) ? values[0] : null;
   }
 
-  public Map getParameterMap() {
+  public Map<?, ?> getParameterMap() {
     return requestPod.getRequestParameters();
   }
 
-  public Enumeration getParameterNames() {
-    return new Enumeration() {
-      Iterator names = requestPod.getRequestParameters().keySet().iterator();
+  public Enumeration<?> getParameterNames() {
+    return new Enumeration<Object>() {
+      Iterator<?> names = requestPod.getRequestParameters().keySet().iterator();
 
       public boolean hasMoreElements() {
         return names.hasNext();
@@ -90,7 +91,7 @@ public class GuardRequest extends HttpServletRequestWrapper {
     };
   }
 
-  public Enumeration getAttributeNames() {
+  public Enumeration<?> getAttributeNames() {
     return super.getAttributeNames();
   }
 
@@ -112,11 +113,11 @@ public class GuardRequest extends HttpServletRequestWrapper {
     return (headers.get(name) != null) ? (String)headers.get(name) : (String)headers.get(name.toLowerCase());
   }
 
-  public Enumeration getHeaderNames() {
+  public Enumeration<String> getHeaderNames() {
     return headers.keys();
   }
 
-  public Enumeration getHeaders(String name) {
+  public Enumeration<?> getHeaders(String name) {
     return super.getHeaders(name);
   }
 

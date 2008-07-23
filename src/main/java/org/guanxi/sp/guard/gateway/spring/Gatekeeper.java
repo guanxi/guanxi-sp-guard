@@ -100,11 +100,11 @@ public class Gatekeeper extends HandlerInterceptorAdapter implements ServletCont
           Pod pod = (Pod)servletContext.getAttribute(cookies[c].getValue());
           
           if (pod != null) {
-            Enumeration e = pod.getBag().getAttributeNames();
+            Enumeration<String> e = pod.getBag().getAttributeNames();
             String attributeName = null;
             
             while (e.hasMoreElements()) {
-              attributeName = (String)e.nextElement();
+              attributeName = e.nextElement();
 
               // Find a match for the access attribute
               if (attributeName.equals(letMeInAttribute)) {
