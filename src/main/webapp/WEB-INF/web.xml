@@ -15,6 +15,11 @@
     </init-param>
   </filter>
 
+  <context-param>
+    <param-name>log4jConfigLocation</param-name>
+    <param-value>/WEB-INF/classes/log4j.properties</param-value>
+  </context-param>
+
   <filter-mapping>
     <filter-name>Guanxi Resource Guard</filter-name>
     <url-pattern>/protected/*</url-pattern>
