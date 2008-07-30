@@ -17,15 +17,11 @@
 package org.guanxi.sp.guard;
 
 import org.guanxi.common.definitions.Guanxi;
-import org.guanxi.common.definitions.Logging;
 import org.guanxi.common.filters.FileName;
 import org.guanxi.common.*;
 import org.guanxi.common.security.SecUtils;
 import org.guanxi.xal.sp.GuardDocument;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.RollingFileAppender;
-import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.xmlbeans.XmlOptions;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import javax.servlet.*;
@@ -48,7 +44,7 @@ import java.security.cert.X509Certificate;
  */
 public class Guard implements Filter {
   /** Our logger */
-  private static Logger log = Logger.getLogger(Guard.class);
+  private static final Logger logger = Logger.getLogger(Guard.class.getName());
   /** The name of the web.xml init-param that holds the location of the config file */
   private static final String CONFIG_FILE_PARAM = "configFile";
   /** This Filter's config object as set by the container */
@@ -70,9 +66,6 @@ public class Guard implements Filter {
         // We've loaded it, so we should unload it
         okToUnloadBCProvider = true;
       }
-
-      // Get the logger ready
-      initLogger(config.getServletContext());
 
       // Load up the config file...
       GuardDocument guardDoc = GuardDocument.Factory.parse(new File((String)filterConfig.getServletContext().getRealPath(config.getInitParameter(CONFIG_FILE_PARAM))));
@@ -109,7 +102,7 @@ public class Guard implements Filter {
                                             guardDoc.getGuard().getGuardInfo().getID()); // alias for certificate
         }
         catch (GuanxiException ge) {
-          log.error("Can't create self signed keystore - secure Engine comms won't be available : ",
+          logger.error("Can't create self signed keystore - secure Engine comms won't be available : ",
                     ge);
           throw new ServletException(ge);
         }
@@ -124,14 +117,14 @@ public class Guard implements Filter {
                                     guardDoc.getGuard().getTrustStorePassword());
         }
         catch (GuanxiException ge) {
-          log.error("Can't create truststore - secure Engine comms won't be available : ",
+          logger.error("Can't create truststore - secure Engine comms won't be available : ",
                     ge);
           throw new ServletException(ge);
         }
       }
     }
     catch (Exception e) {
-      log.error("Guard init failure", e);
+      logger.error("Guard init failure", e);
       throw new ServletException(e);
     }
   }
@@ -175,25 +168,25 @@ public class Guard implements Filter {
       return;
     }
 
-    log.debug("Looking for Guard cookie with name : " + cookieName);
+    logger.debug("Looking for Guard cookie with name : " + cookieName);
 
     Cookie[] cookies = httpRequest.getCookies();
     boolean foundPod = false;
     if (cookies != null) {
       for (int i = 0; i < cookies.length; i++) {
-        log.debug("Found cookie : " + cookies[i].getName());
+        logger.debug("Found cookie : " + cookies[i].getName());
         if (cookies[i].getName().equals(cookieName)) {
           // See if there's a pod for the request
           Pod pod = (Pod)filterConfig.getServletContext().getAttribute(cookies[i].getValue());
 
           // If there isn't then we must get rid of the cookie
           if (pod == null) {
-            log.debug("Found a Guard cookie but no Pod of attributes : " + cookies[i].getName());
+            logger.debug("Found a Guard cookie but no Pod of attributes : " + cookies[i].getName());
             cookies[i].setMaxAge(0);
             httpResponse.addCookie(cookies[i]);
           }
           else {
-            log.debug("Found a Guard cookie with a Pod of attributes : " + cookies[i].getName());
+            logger.debug("Found a Guard cookie with a Pod of attributes : " + cookies[i].getName());
             foundPod = true;
 
             // Add any new parameters to the original request
@@ -210,7 +203,7 @@ public class Guard implements Filter {
     }
 
     if (!foundPod) {
-      log.debug("No pod of attributes found - redirecting to the WAYF");
+      logger.debug("No pod of attributes found - redirecting to the WAYF");
     }
 
     // This is the session ID that we'll use to track the request
@@ -245,7 +238,7 @@ public class Guard implements Filter {
     if (filterConfig.getServletContext().getAttribute(config.getGuardInfo().getID() + "SECURE_CHECK_DONE") == null) {
       try {
         if (Util.isEngineSecure(config.getEngineInfo().getWAYFLocationService())) {
-          log.info("Probing for Engine certificate");
+          logger.info("Probing for Engine certificate");
 
           /* If the Engine is using HTTPS then we'll need to connect to it, extract it's
            * certificate and add it to our truststore. To do that, we'll need to use our
@@ -275,7 +268,7 @@ public class Guard implements Filter {
           filterConfig.getServletContext().setAttribute(config.getGuardInfo().getID() + "SECURE_CHECK_DONE",
                                                         "SECURE");
 
-          log.info("Added : " + engineX509.getSubjectDN().getName() + " to truststore");
+          logger.info("Added : " + engineX509.getSubjectDN().getName() + " to truststore");
         }
         else {
           // Mark Guard as having been checked for secure comms
@@ -284,7 +277,7 @@ public class Guard implements Filter {
         }
       }
       catch (Exception e) {
-        log.error("Secure probe to Engine failed", e);
+        logger.error("Secure probe to Engine failed", e);
         request.setAttribute("ERROR_ID", "ID_WAYF_WS_NOT_RESPONDING");
         request.setAttribute("ERROR_MESSAGE", e.getMessage());
         request.getRequestDispatcher("/WEB-INF/guanxi_sp_guard/jsp/sp_error.jsp").forward(request,
@@ -314,7 +307,7 @@ public class Guard implements Filter {
       }
     }
     catch (Exception e) {
-      log.error("Engine WAYF Web Service not responding", e);
+      logger.error("Engine WAYF Web Service not responding", e);
       request.setAttribute("ERROR_ID", "ID_WAYF_WS_NOT_RESPONDING");
       request.setAttribute("ERROR_MESSAGE", e.getMessage());
       request.getRequestDispatcher("/WEB-INF/guanxi_sp_guard/jsp/sp_error.jsp").forward(request,
@@ -323,7 +316,7 @@ public class Guard implements Filter {
     }
 
     if (Errors.isError(wayfLocation)) {
-      log.error("Engine WAYF Web Service returned error : " + wayfLocation);
+      logger.error("Engine WAYF Web Service returned error : " + wayfLocation);
       request.setAttribute("ERROR_ID", "ID_WAYF_WS_ERROR");
       request.setAttribute("ERROR_MESSAGE", wayfLocation);
       request.getRequestDispatcher("/WEB-INF/guanxi_sp_guard/jsp/sp_error.jsp").forward(request,
@@ -331,7 +324,7 @@ public class Guard implements Filter {
       return;
     }
 
-    log.debug("Got WAYF location " + wayfLocation);
+    logger.debug("Got WAYF location " + wayfLocation);
 
     // The target parameter is meant to come back as is from the IdP
     wayfLocation += "?shire=" + config.getEngineInfo().getAuthConsumerURL();
@@ -354,31 +347,6 @@ public class Guard implements Filter {
     if (pod != null) {
       pod.getContext().setAttribute(pod.getSessionID(), null);
     }
-  }
-
-  private void initLogger(ServletContext context) throws GuanxiException {
-    DOMConfigurator.configure(context.getRealPath(Logging.DEFAULT_SP_GUARD_CONFIG_FILE));
-
-    PatternLayout defaultLayout = new PatternLayout(Logging.DEFAULT_LAYOUT);
-
-    RollingFileAppender rollingFileAppender = new RollingFileAppender();
-    rollingFileAppender.setName("GuanxiGuard");
-    try {
-      rollingFileAppender.setFile(context.getRealPath(Logging.DEFAULT_SP_GUARD_LOG_DIR + "guanxi-sp-guard.log"),
-                                  true,
-                                  false,
-                                  0);
-    }
-    catch (IOException ioe) {
-      throw new GuanxiException(ioe);
-    }
-    rollingFileAppender.setMaxFileSize("1MB");
-    rollingFileAppender.setMaxBackupIndex(5);
-    rollingFileAppender.setLayout(defaultLayout);
-
-    log.removeAllAppenders();
-    log.addAppender(rollingFileAppender);
-    log.setAdditivity(false);
   }
 
   /**
