@@ -1,0 +1,11 @@
+# This is the PHP config file for a Guanxi PHP Guard. You can drop this into any directory on the
+# web server that is capable of allowing the use of overrides specified in this file.
+
+# This is the full path to the Guanxi PHP Guard
+php_value auto_prepend_file /Users/alistair/web/htdocs/gxrest/GuanxiGuard.php
+
+# ------------------------------------------------------------------------------------------
+# DO NOT EDIT BELOW THIS LINE
+
+# This must be set to On to allow the Attribute Consumer Service to parse the SAML from the Engine
+php_value always_populate_raw_post_data On
