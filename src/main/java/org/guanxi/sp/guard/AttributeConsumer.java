@@ -17,7 +17,6 @@
 package org.guanxi.sp.guard;
 
 import org.guanxi.common.*;
-import org.guanxi.common.definitions.Logging;
 import org.guanxi.common.definitions.EduPerson;
 import org.guanxi.xal.soap.EnvelopeDocument;
 import org.guanxi.xal.soap.Header;
@@ -25,9 +24,6 @@ import org.guanxi.xal.saml_1_0.protocol.ResponseDocument;
 import org.guanxi.xal.saml_1_0.assertion.AssertionType;
 import org.guanxi.xal.saml_1_0.assertion.AttributeStatementType;
 import org.guanxi.xal.saml_1_0.assertion.AttributeType;
-import org.apache.log4j.xml.DOMConfigurator;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlObject;
 import org.w3c.dom.NodeList;
@@ -36,7 +32,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
-import javax.servlet.ServletContext;
 import java.io.*;
 
 /**
@@ -80,16 +75,9 @@ import java.io.*;
  */
 @SuppressWarnings("serial")
 public class AttributeConsumer extends HttpServlet {
-  /** Our logger */
-  private static Logger log = Logger.getLogger(AttributeConsumer.class);
+  private static final Logger logger = Logger.getLogger(AttributeConsumer.class.getName());
 
   public void init() throws ServletException {
-    try {
-      initLogger(getServletContext());
-    }
-    catch(GuanxiException ge) {
-      throw new ServletException(ge);
-    }
   }
 
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -196,30 +184,8 @@ public class AttributeConsumer extends HttpServlet {
       soapEnvelopeDoc.save(response.getOutputStream());
     }
     catch(Exception e) {
-      log.error(e);
+      logger.error(e);
       throw new ServletException(e);
     }
-  }
-
-  private void initLogger(ServletContext context) throws GuanxiException {
-    DOMConfigurator.configure(context.getRealPath(Logging.DEFAULT_SP_GUARD_CONFIG_FILE));
-
-    PatternLayout defaultLayout = new PatternLayout(Logging.DEFAULT_LAYOUT);
-
-    RollingFileAppender rollingFileAppender = new RollingFileAppender();
-    rollingFileAppender.setName("GuanxiGuardAttributeConsumerService");
-    try {
-      rollingFileAppender.setFile(context.getRealPath(Logging.DEFAULT_SP_GUARD_LOG_DIR + "guanxi-sp-guard-attribute-consumer-service.log"), true, false, 0);
-    }
-    catch(IOException ioe) {
-      throw new GuanxiException(ioe);
-    }
-    rollingFileAppender.setMaxFileSize("1MB");
-    rollingFileAppender.setMaxBackupIndex(5);
-    rollingFileAppender.setLayout(defaultLayout);
-
-    log.removeAllAppenders();
-    log.addAppender(rollingFileAppender);
-    log.setAdditivity(false);
   }
 }
