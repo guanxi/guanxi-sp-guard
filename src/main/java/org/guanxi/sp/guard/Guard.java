@@ -40,6 +40,9 @@ import java.security.Provider;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * <font size=5><b></b></font>
@@ -507,5 +510,34 @@ public class Guard implements Filter {
    */
   public static String getAttributePrefix() {
     return attributePrefix;
+  }
+  
+  /**
+   * This returns a map of all the headers that are the attributes that have been
+   * retrieved from the IdP. The headers that are attributes are identified by the
+   * prefix that is added to all attribute headers. This prefix should be chosen
+   * so that it does not conflict with any existing 
+   * 
+   * @param request
+   * @return
+   */
+  public static Map<String, String> getAttributes(HttpServletRequest request) {
+    Map<String, String> attributes;
+    Enumeration<String> headers;
+    String currentHeader, value;
+    
+    attributes      = new TreeMap<String, String>();
+    headers         = request.getHeaderNames();
+    attributePrefix = org.guanxi.sp.guard.Guard.getAttributePrefix();
+    
+    while ( (currentHeader = headers.nextElement()) != null ) {
+      if ( currentHeader.startsWith(attributePrefix) ) {
+        value         = request.getHeader(currentHeader);
+        currentHeader = currentHeader.substring(attributePrefix.length());
+        attributes.put(currentHeader, value);
+      }
+    }
+    
+    return attributes;
   }
 }
