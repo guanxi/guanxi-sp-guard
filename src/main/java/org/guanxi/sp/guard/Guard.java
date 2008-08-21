@@ -264,21 +264,21 @@ public class Guard implements Filter {
     logger.debug("Looking for Guard cookie with name : " + cookieName);
     
     cookies    = httpRequest.getCookies();
-    if (cookies != null) {
-      for (int i = 0; i < cookies.length; i++) {
-        logger.debug("Found cookie : " + cookies[i].getName());
-        if (cookies[i].getName().equals(cookieName)) {
+    if ( cookies != null ) {
+      for ( Cookie currentCookie : cookies ) {
+        logger.debug("Found cookie : " + currentCookie.getName());
+        if (currentCookie.getName().equals(cookieName)) {
           // See if there's a pod for the request
-          Pod pod = (Pod)filterConfig.getServletContext().getAttribute(cookies[i].getValue());
+          Pod pod = (Pod)filterConfig.getServletContext().getAttribute(currentCookie.getValue());
 
           // If there isn't then we must get rid of the cookie
           if (pod == null) {
-            logger.debug("Found a Guard cookie but no Pod of attributes : " + cookies[i].getName());
-            cookies[i].setMaxAge(0);
-            httpResponse.addCookie(cookies[i]);
+            logger.debug("Found a Guard cookie but no Pod of attributes : " + currentCookie.getName());
+            currentCookie.setMaxAge(0);
+            httpResponse.addCookie(currentCookie);
           }
           else {
-            logger.debug("Found a Guard cookie with a Pod of attributes : " + cookies[i].getName());
+            logger.debug("Found a Guard cookie with a Pod of attributes : " + currentCookie.getName());
 
             // Add any new parameters to the original request
             pod.setRequestParameters(httpRequest.getParameterMap());
@@ -423,7 +423,12 @@ public class Guard implements Filter {
                                        EntityConnection.PROBING_OFF);
     wayfService.setDoOutput(true);
     wayfService.connect();
-    wayfLocation = wayfService.getContentAsString();
+    try {
+      wayfLocation = wayfService.getContentAsString();
+    }
+    catch ( IOException e ) {
+      throw new GuanxiException(e);
+    }
     if (wayfLocation.equals(Guanxi.SESSION_VERIFIER_RETURN_VERIFIED)) {
     }
 
@@ -521,6 +526,7 @@ public class Guard implements Filter {
    * @param request
    * @return
    */
+  @SuppressWarnings("unchecked")
   public static Map<String, String> getAttributes(HttpServletRequest request) {
     Map<String, String> attributes;
     Enumeration<String> headers;
@@ -530,7 +536,8 @@ public class Guard implements Filter {
     headers         = request.getHeaderNames();
     attributePrefix = org.guanxi.sp.guard.Guard.getAttributePrefix();
     
-    while ( (currentHeader = headers.nextElement()) != null ) {
+    while ( headers.hasMoreElements() ) {
+      currentHeader = headers.nextElement();
       if ( currentHeader.startsWith(attributePrefix) ) {
         value         = request.getHeader(currentHeader);
         currentHeader = currentHeader.substring(attributePrefix.length());
