@@ -77,4 +77,13 @@
     <url-pattern>*.guanxiGuardlogout</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>metadata</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <load-on-startup>6</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>metadata</servlet-name>
+    <url-pattern>/metadata.xml</url-pattern>
+  </servlet-mapping>
 </web-app>
