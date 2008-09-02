@@ -20,6 +20,7 @@ import org.guanxi.common.definitions.Guanxi;
 import org.guanxi.common.filters.FileName;
 import org.guanxi.common.*;
 import org.guanxi.common.security.SecUtils;
+import org.guanxi.common.security.ssl.SSL;
 import org.guanxi.xal.sp.GuardDocument;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlOptions;
@@ -366,10 +367,8 @@ public class Guard implements Filter {
          */
         engineConnection = new EntityConnection(config.getEngineInfo().getWAYFLocationService(),
                                                                  config.getGuardInfo().getID(),
-                                                                 config.getKeystore(),
-                                                                 config.getKeystorePassword(),
-                                                                 config.getTrustStore(),
-                                                                 config.getTrustStorePassword(),
+                                                                 SSL.getKeyManagers(config.getGuardInfo().getID(), config.getKeystore(), config.getKeystorePassword()),
+                                                                 SSL.getTrustManagers(config.getTrustStore(), config.getTrustStorePassword(), EntityConnection.PROBING_ON),
                                                                  EntityConnection.PROBING_ON);
         engineX509 = engineConnection.getServerCertificate();
 
@@ -416,10 +415,8 @@ public class Guard implements Filter {
     
     wayfService = new EntityConnection(queryString,
                                        config.getGuardInfo().getID(),
-                                       config.getKeystore(),
-                                       config.getKeystorePassword(),
-                                       config.getTrustStore(),
-                                       config.getTrustStorePassword(),
+                                       SSL.getKeyManagers(config.getGuardInfo().getID(), config.getKeystore(), config.getKeystorePassword()),
+                                       SSL.getTrustManagers(config.getTrustStore(), config.getTrustStorePassword(), EntityConnection.PROBING_OFF),
                                        EntityConnection.PROBING_OFF);
     wayfService.setDoOutput(true);
     wayfService.connect();
