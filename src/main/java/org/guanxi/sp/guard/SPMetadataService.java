@@ -10,11 +10,10 @@ import java.security.KeyStore;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.axis.encoding.Base64;
 import org.guanxi.common.definitions.Guanxi;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
-
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
 /**
  * This is a Controller that will display the Shibboleth SP metadata to the 
