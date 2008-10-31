@@ -168,7 +168,12 @@ public class AttributeConsumer extends HttpServlet {
             }
             else {
               if (obj[cc].getDomNode().getFirstChild() != null) {
-                bag.addAttribute(attributes[c].getAttributeName(), obj[cc].getDomNode().getFirstChild().getNodeValue());
+                if (obj[cc].getDomNode().getFirstChild().getNodeValue() != null) {
+                  bag.addAttribute(attributes[c].getAttributeName(), obj[cc].getDomNode().getFirstChild().getNodeValue());
+                }
+                else {
+                  bag.addAttribute(attributes[c].getAttributeName(), "");
+                }
               }
             }
           }
