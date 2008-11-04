@@ -160,10 +160,13 @@ public class AttributeConsumer extends HttpServlet {
         for (int c=0; c < attributes.length; c++) {
           XmlObject[] obj = attributes[c].getAttributeValueArray();
           for (int cc=0; cc < obj.length; cc++) {
-            if (attributes[c].getAttributeName().equals(EduPerson.EDUPERSON_SCOPED_AFFILIATION)) {
+            if ((attributes[c].getAttributeName().equals(EduPerson.EDUPERSON_SCOPED_AFFILIATION)) ||
+                (attributes[c].getAttributeName().equals(EduPerson.EDUPERSON_TARGETED_ID))) {
               String attrValue = obj[cc].getDomNode().getFirstChild().getNodeValue();
-              attrValue += EduPerson.EDUPERSON_SCOPED_DELIMITER;
-              attrValue += obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE).getNodeValue();
+              if (obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE) != null) {
+                attrValue += EduPerson.EDUPERSON_SCOPED_DELIMITER;
+                attrValue += obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE).getNodeValue();
+              }
               bag.addAttribute(attributes[c].getAttributeName(), attrValue);
             }
             else {
