@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.net.URLEncoder;
 import java.security.Security;
 import java.security.Provider;
 import java.security.KeyStore;
@@ -326,11 +327,13 @@ public class Guard implements Filter {
 
     logger.debug("Got WAYF location " + wayfLocation);
 
-    // The target parameter is meant to come back as is from the IdP
-    wayfLocation += "?shire=" + config.getEngineInfo().getAuthConsumerURL();
-    wayfLocation += "&target=" + sessionID;
+    /* The target parameter is for the private use of the SP and
+     * is meant to come back as is from the IdP
+     */
+    wayfLocation += "?shire=" + URLEncoder.encode(config.getEngineInfo().getAuthConsumerURL(), "UTF-8");
+    wayfLocation += "&target=" + URLEncoder.encode(sessionID, "UTF-8");
     wayfLocation += "&time=" + (System.currentTimeMillis() / 1000);
-    wayfLocation += "&providerId=" + config.getGuardInfo().getID();
+    wayfLocation += "&providerId=" + URLEncoder.encode(config.getGuardInfo().getID(), "UTF-8");
 
     // Send the user to the WAYF or IdP
     httpResponse.sendRedirect(wayfLocation);
