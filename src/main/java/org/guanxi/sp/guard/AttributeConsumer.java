@@ -18,6 +18,7 @@ package org.guanxi.sp.guard;
 
 import org.guanxi.common.*;
 import org.guanxi.common.definitions.EduPerson;
+import org.guanxi.common.definitions.Guanxi;
 import org.guanxi.xal.soap.EnvelopeDocument;
 import org.guanxi.xal.soap.Header;
 import org.guanxi.xal.saml_1_0.protocol.ResponseDocument;
@@ -100,19 +101,8 @@ public class AttributeConsumer extends HttpServlet {
    */
   public void process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     try {
-      // Read the request into a String...
-      InputStream in = request.getInputStream();
-      //BufferedReader buffer = new BufferedReader(new InputStreamReader(in));
-      BufferedReader buffer = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-      StringBuffer stringBuffer = new StringBuffer();
-      String line = null;
-      while ((line = buffer.readLine()) != null) {
-        stringBuffer.append(line);
-      }
-      in.close();
-
-      // ...and parse the SOAP message
-      EnvelopeDocument soapDoc = EnvelopeDocument.Factory.parse(stringBuffer.toString());
+      // Parse the SOAP message
+      EnvelopeDocument soapDoc = EnvelopeDocument.Factory.parse(request.getParameter(Guanxi.REQUEST_PARAMETER_SAML_ATTRIBUTES));
 
       /* Get the GuanxiGuardSessionID SOAP header. This tells us which Guard session contains
        * the Pod to which we should attach this Bag of attributes.
