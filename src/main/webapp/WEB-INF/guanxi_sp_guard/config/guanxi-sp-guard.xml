@@ -24,4 +24,10 @@
   <Keystore>__GUARD_APP_ROOT__/WEB-INF/guanxi_sp_guard/keystore/guard.jks</Keystore>
   <KeystorePassword>changeme</KeystorePassword>
   <CertificateAlias>webservices</CertificateAlias>
+
+  <Profiles>
+    <Profile url="^(/\w*)(/free/.*)" profile="none" />
+    <Profile url="^(/\w*)(/protected/.*)" profile="shibboleth" />
+    <Profile url="^(/\w*)/(s2wbsso)/(.*)(/protected/.*)" profile="saml2-web-browser-sso" />
+  </Profiles>
 </Guard>
