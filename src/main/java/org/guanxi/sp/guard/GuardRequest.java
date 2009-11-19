@@ -112,6 +112,11 @@ public class GuardRequest extends HttpServletRequestWrapper {
     // Look for the header name as is. If it's not there, try all lower case
     return (headers.get(name) != null) ? (String)headers.get(name) : (String)headers.get(name.toLowerCase());
   }
+  
+  public boolean headersContain(String name)
+  {
+	  return headers.containsKey(name);
+  }
 
   public Enumeration<String> getHeaderNames() {
     return headers.keys();

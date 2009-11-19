@@ -60,10 +60,15 @@ public class SessionVerifier extends HttpServlet {
    */
   public void process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     String sessionID = request.getParameter(Guanxi.SESSION_VERIFIER_PARAM_SESSION_ID);
+    
     PrintWriter out = response.getWriter();
     
     // Have we got a pod for this session?
-    if (getServletContext().getAttribute(sessionID) != null) {
+    if(processExtendedVerificationAttributes(request,out)) 
+    {
+    	//output must be written within processExtendedVerificationAttributes
+    }
+    else if (getServletContext().getAttribute(sessionID) != null) {
       out.write(Guanxi.SESSION_VERIFIER_RETURN_VERIFIED);
     }
     else {
@@ -71,5 +76,10 @@ public class SessionVerifier extends HttpServlet {
     }
 
     out.close();
+  }
+  
+  protected boolean processExtendedVerificationAttributes(HttpServletRequest request, PrintWriter out)
+  {
+	  return false;
   }
 }

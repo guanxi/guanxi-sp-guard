@@ -98,9 +98,9 @@ public class Podder extends HttpServlet {
    */
   public void process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     // Sort out the cookie path
-    String cookieDomain = (config.getCookie().getDomain() == null) ? "" : config.getCookie().getDomain();
+    String cookieDomain = (config.getCookie().getDomain() == null) ? "" : postProcessGetGuardId(config.getCookie().getDomain(),request);
     
-    String cookieName = config.getCookie().getPrefix() + FileName.encode(config.getGuardInfo().getID());
+    String cookieName = config.getCookie().getPrefix() + FileName.encode(postProcessGetGuardId(config.getGuardInfo().getID(),request));
 
     // "id" is the sessionID set by the Guard filter
     Pod pod = (Pod)getServletContext().getAttribute(request.getParameter("id"));
@@ -121,5 +121,17 @@ public class Podder extends HttpServlet {
 
     // Redirect to the requested resource. The filter will handle access and attributes
     response.sendRedirect(pod.getRequestScheme() + "://" + pod.getHostName() + pod.getRequestURL());
+  }
+  
+  /**
+   * Opportunity for extending filters to dynamically control the guard id
+   * 
+   * @param id
+   * @param httpRequest
+   * @return
+   */
+  protected String postProcessGetGuardId(String id, HttpServletRequest httpRequest)
+  {
+	  return id;
   }
 }

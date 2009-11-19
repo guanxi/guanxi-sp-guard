@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.net.URLEncoder;
 import java.security.Security;
 import java.security.Provider;
 import java.security.KeyStore;
@@ -161,10 +160,15 @@ public class Guard implements Filter {
 
     // Get the config
     org.guanxi.xal.sp.GuardDocument.Guard config = (org.guanxi.xal.sp.GuardDocument.Guard)filterConfig.getServletContext().getAttribute(Guanxi.CONTEXT_ATTR_GUARD_CONFIG);
-    String cookieName = config.getCookie().getPrefix() + FileName.encode(config.getGuardInfo().getID());
+    String cookieName = config.getCookie().getPrefix() + FileName.encode(postProcessGetGuardId(config.getGuardInfo().getID(), httpRequest)); //CHRIS CHANGE - add post process guard id callback
     
     // Don't block web service calls from a Guanxi SAML Engine
-    if ((httpRequest.getRequestURI().endsWith("guard.sessionVerifier")) || (httpRequest.getRequestURI().endsWith("guard.guanxiGuardACS")) || (httpRequest.getRequestURI().endsWith("guard.guanxiGuardlogout")) || (httpRequest.getRequestURI().endsWith("guard.guanxiGuardPodder"))) {
+    //CHRIS CHANGE - added check callback 
+    if ((httpRequest.getRequestURI().endsWith("guard.sessionVerifier")) || 
+    		(httpRequest.getRequestURI().endsWith("guard.guanxiGuardACS")) || 
+    		(httpRequest.getRequestURI().endsWith(getLogoutPage(httpRequest))) || 
+    		(httpRequest.getRequestURI().endsWith("guard.guanxiGuardPodder")) ||
+    		checkSkipFilter(httpRequest)) {
       filterChain.doFilter(request, response);
       return;
     }
@@ -192,10 +196,15 @@ public class Guard implements Filter {
 
             // Add any new parameters to the original request
             pod.setRequestParameters(request.getParameterMap());
+                
+            GuardRequest guardRequest = new GuardRequest(httpRequest,
+                    pod,
+                    config.getGuardInfo().getAttributePrefix());
+            
+            //CHRIS CHANGE - added pre filter chain callback 
+            preSuccessFilterChain(guardRequest);
 
-            filterChain.doFilter(new GuardRequest(httpRequest,
-                                                  pod,
-                                                  config.getGuardInfo().getAttributePrefix()),
+            filterChain.doFilter(guardRequest,
                                  response);
             return;
           }
@@ -218,7 +227,7 @@ public class Guard implements Filter {
 
     // Store the original scheme and hostname
     pod.setRequestScheme(request.getScheme());
-    pod.setHostName(httpRequest.getHeader("Host").replaceAll("/", ""));
+    pod.setHostName(getPodHostName(httpRequest));
 
     /* Store the parameters in the Pod as these are not guaranteed to be around in the
      * original request after the SAML workflow has finished. The servlet container will
@@ -246,7 +255,7 @@ public class Guard implements Filter {
            * own keystore to let the Guard authenticate us.
            */
           EntityConnection engineConnection = new EntityConnection(config.getEngineInfo().getWAYFLocationService(),
-                                                                   config.getGuardInfo().getID(),
+        		  											postProcessGetGuardId(config.getGuardInfo().getID(), httpRequest), //CHRIS CHANGE - add post process guard id callback
                                                                    config.getKeystore(),
                                                                    config.getKeystorePassword(),
                                                                    config.getTrustStore(),
@@ -292,10 +301,11 @@ public class Guard implements Filter {
      */
     String wayfLocation = null;
     try {
-      String queryString = config.getEngineInfo().getWAYFLocationService() + "?" + Guanxi.WAYF_PARAM_GUARD_ID + "=" + config.getGuardInfo().getID();
-      queryString += "&" + Guanxi.WAYF_PARAM_SESSION_ID + "=" + sessionID;
+    	//CHRIS CHANGE - add post process guard id callback
+      String queryString = config.getEngineInfo().getWAYFLocationService() + "?" + Guanxi.WAYF_PARAM_GUARD_ID + "=" + postProcessGetGuardId(config.getGuardInfo().getID(), httpRequest);
+      queryString += "&" + Guanxi.WAYF_PARAM_SESSION_ID + "=" + sessionID + getExtendedWAYFParameters(httpRequest);
       EntityConnection wayfService = new EntityConnection(queryString,
-                                                          config.getGuardInfo().getID(),
+    		  											postProcessGetGuardId(config.getGuardInfo().getID(), httpRequest), //CHRIS CHANGE - add post process guard id callback
                                                           config.getKeystore(),
                                                           config.getKeystorePassword(),
                                                           config.getTrustStore(),
@@ -327,16 +337,77 @@ public class Guard implements Filter {
 
     logger.debug("Got WAYF location " + wayfLocation);
 
-    /* The target parameter is for the private use of the SP and
-     * is meant to come back as is from the IdP
-     */
-    wayfLocation += "?shire=" + URLEncoder.encode(config.getEngineInfo().getAuthConsumerURL(), "UTF-8");
-    wayfLocation += "&target=" + URLEncoder.encode(sessionID, "UTF-8");
+    // The target parameter is meant to come back as is from the IdP
+    wayfLocation += "?shire=" + config.getEngineInfo().getAuthConsumerURL();
+    wayfLocation += "&target=" + sessionID;
     wayfLocation += "&time=" + (System.currentTimeMillis() / 1000);
-    wayfLocation += "&providerId=" + URLEncoder.encode(config.getGuardInfo().getID(), "UTF-8");
+  //CHRIS CHANGE - add post process guard id callback
+    wayfLocation += "&providerId=" + postProcessGetGuardId(config.getGuardInfo().getID(), httpRequest);
 
     // Send the user to the WAYF or IdP
     httpResponse.sendRedirect(wayfLocation);
+  }
+  
+  /**
+   * Opportunity for extending filters to dynamically control the guard id
+   * 
+   * @param id
+   * @param httpRequest
+   * @return
+   */
+  protected String postProcessGetGuardId(String id, HttpServletRequest httpRequest)
+  {
+	  return id;
+  }
+  
+  /**
+   * Opportunity for extending filers to bypass Guard filtering
+   * 
+   * @return
+   */
+  protected boolean checkSkipFilter(HttpServletRequest httpRequest)
+  {
+	  return false;
+  }
+  
+  /**
+   * Opportunity for extending filters to do some work before calling the next filter in the chain
+   * 
+   * @param guardRequest
+   */
+  protected void preSuccessFilterChain(GuardRequest guardRequest) throws ServletException
+  {
+	  //override to do application specific setup
+  }
+  
+  /**
+   * Opportunity for extending filters to do some work before calling the next filter in the chain
+   * 
+   * @param guardRequest
+   */
+  protected String getLogoutPage(HttpServletRequest guardRequest) throws ServletException
+  {
+	  return "guard.guanxiGuardlogout";
+  }
+  
+  /**
+   * Opportunity for extending filters to do some work before calling the next filter in the chain
+   * 
+   * @param guardRequest
+   */
+  protected String getPodHostName(HttpServletRequest guardRequest) throws ServletException
+  {
+	  return guardRequest.getHeader("Host").replaceAll("/", "");
+  }
+  
+  /**
+   * Opportunity for extending filters to do some work before calling the next filter in the chain
+   * 
+   * @param guardRequest
+   */
+  protected String getExtendedWAYFParameters(HttpServletRequest guardRequest) throws ServletException
+  {
+	  return "";
   }
 
   /**
