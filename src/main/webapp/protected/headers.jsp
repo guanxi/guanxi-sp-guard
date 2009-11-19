@@ -11,10 +11,12 @@
     while (e.hasMoreElements()) {
       name = (String)e.nextElement();
       value = request.getHeader(name);
-      p.print(name + " --> " + value + "<br>");
+      if (name.startsWith("HTTP_")) {
+        p.print(name + " --> " + value + "<br>");
+      }
     }
-    p.print("<br /><br /><a href=\"http://localhost:8080/protectedapp/guard.guanxiGuardlogout\">Logout of the SP</a>");
-    p.print("<br /><br /><a href=\"http://localhost:8080/guanxi_idp/shibb/logout\">Logout of the IdP</a>");
+    p.print("<br /><br /><a href=\"https://localhost:8443/protectedapp/guard.guanxiGuardlogout\">Logout of the SP</a>");
+    p.print("<br /><br /><a href=\"https://localhost:8443/guanxi_idp/shibb/logout\">Logout of the IdP</a>");
     p.flush();
     p.close();
   %>
