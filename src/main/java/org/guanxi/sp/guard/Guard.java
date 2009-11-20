@@ -116,10 +116,7 @@ public class Guard extends GuardBase {
       }
 
       logger.info("SAML2 Web Browser SSO : " + profile.resourceURI + " : " + profile.entityID);
-
-      request.setAttribute("ERROR_ID", "ID_WAYF_WS_ERROR");
-      request.setAttribute("ERROR_MESSAGE", "saml2-web-browser-sso : " + profile.entityID);
-      request.getRequestDispatcher("/WEB-INF/guanxi_sp_guard/jsp/sp_error.jsp").forward(request, response);
+      gotoWBSSO(pod.getSessionID(), profile.entityID, request, response);
       return;
     }
   }
