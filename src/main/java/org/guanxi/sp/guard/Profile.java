@@ -16,8 +16,16 @@
 
 package org.guanxi.sp.guard;
 
+/**
+ * Encapsulates information about profile based access to a resource
+ *
+ * @author alistair
+ */
 public class Profile {
-  public String profile = null;
+  /** The name of the profile */
+  public String name = null;
+  /** The entityID of the actor who is accessing the resource */
   public String entityID = null;
-  public String resourceURL = null;
+  /** The path of the resource being accessed */
+  public String resourceURI = null;
 }
