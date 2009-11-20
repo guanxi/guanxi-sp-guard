@@ -21,6 +21,7 @@ import org.guanxi.common.security.SecUtils;
 import org.guanxi.common.filters.FileName;
 import org.guanxi.common.definitions.Guanxi;
 import org.guanxi.xal.sp.GuardDocument;
+import org.guanxi.xal.sp.GuardProfile;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlException;
@@ -406,26 +407,45 @@ public abstract class GuardBase implements Filter {
     return false;
   }
 
-  protected Profile uriMatches(String requestURI, String regex, String profileName) {
-    Pattern pattern = Pattern.compile(regex);
-    Matcher matcher = pattern.matcher(requestURI);
-    if (matcher.find()) {
-      Profile profile = new Profile();
+  protected Profile getProfile(HttpServletRequest httpRequest) {
+    Pattern pattern = null;
+    Matcher matcher = null;
 
-      if (profileName.equals("none")) {
-        profile.resourceURL = matcher.group(1) + matcher.group(2);
-      }
-
-      if (profileName.equals("shibboleth")) {
-        profile.resourceURL = matcher.group(1) + matcher.group(2);
-      }
-
-      if (profileName.equals("saml2-web-browser-sso")) {
-        profile.entityID = matcher.group(3);
-        profile.resourceURL = matcher.group(1) + matcher.group(4);
-      }
+    GuardProfile[] guardProfiles = guardConfig.getProfiles().getProfileArray();
+    for (GuardProfile guardProfile : guardProfiles) {
+      pattern = Pattern.compile(guardProfile.getPath());
+      matcher = pattern.matcher(httpRequest.getRequestURI());
       
-      return profile;
+      if (matcher.find()) {
+        Profile profile = new Profile();
+        profile.name = guardProfile.getName();
+
+        if (guardProfile.getName().equals("none")) {
+          profile.resourceURI = matcher.group(1) + matcher.group(2);
+        }
+
+        if (guardProfile.getName().equals("shibboleth")) {
+          profile.resourceURI = matcher.group(1) + matcher.group(2);
+        }
+
+        if (guardProfile.getName().equals("saml2-web-browser-sso")) {
+          // The entityID can come from the URL itself or a query param
+          if (guardProfile.getBinding() != null) {
+            if (guardProfile.getBinding().equalsIgnoreCase("rest")) {
+              // app/s2wbsso/entityid/resource ...
+              profile.entityID = matcher.group(3);
+              profile.resourceURI = matcher.group(1) + matcher.group(4);
+            }
+          }
+          else {
+            // app/resource/?entityid= ...
+            profile.entityID = httpRequest.getParameter("entityid");
+            profile.resourceURI = matcher.group(1) + matcher.group(2);
+          }
+        }
+
+        return profile;
+      }
     }
 
     return null;
