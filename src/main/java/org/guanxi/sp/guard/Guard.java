@@ -17,7 +17,6 @@
 package org.guanxi.sp.guard;
 
 import org.guanxi.common.*;
-import org.guanxi.xal.sp.GuardProfile;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
@@ -55,7 +54,6 @@ public class Guard extends GuardBase {
     logger.debug("Looking for Guard cookie with name : " + cookieName);
 
     // If no profiles are specified then something's wrong
-    String profileName = null;
     Profile profile = null;
     if ((guardConfig.getProfiles() == null) ||
         (guardConfig.getProfiles().getProfileArray() == null) ||
@@ -68,30 +66,23 @@ public class Guard extends GuardBase {
     }
 
     // Work out what profile to use for the resource
-    GuardProfile[] guardProfiles = guardConfig.getProfiles().getProfileArray();
-    for (GuardProfile guardProfile : guardProfiles) {
-      profile = uriMatches(httpRequest.getRequestURI(), guardProfile.getUrl(), guardProfile.getProfile());
-      if (profile != null) {
-        profileName = guardProfile.getProfile();
-        logger.info(profileName + " -> " + profile.entityID + " -> " + profile.resourceURL);
-        break;
-      }
-    }
+    profile = getProfile(httpRequest);
 
     // Are we handling a profile URL we don't support?
-    if (profileName == null) {
+    if (profile == null) {
       request.setAttribute("ERROR_ID", "ID_WAYF_WS_ERROR");
       request.setAttribute("ERROR_MESSAGE", "Unsupported profile");
       request.getRequestDispatcher("/WEB-INF/guanxi_sp_guard/jsp/sp_error.jsp").forward(request, response);
       return;
     }
 
-    if (profileName.equals("none")) {
-      logger.info("Free access to resource : " + profile.resourceURL);
+    if (profile.name.equals("none")) {
+      logger.info("Free access to resource : " + profile.resourceURI);
       filterChain.doFilter(request, response);
       return;
     }
 
+    // From now it's authenticated profile based access
     Pod podFromCookie = doCookies(httpRequest, httpResponse);
     if (podFromCookie != null) {
       filterChain.doFilter(new GuardRequest(httpRequest,
@@ -106,24 +97,28 @@ public class Guard extends GuardBase {
     logger.debug("No pod of attributes found - starting profile search");
 
     Pod pod = createPod(request);
-    pod.setRequestURL((profile.resourceURL));
+    pod.setRequestURL((profile.resourceURI));
 
-    if (profileName.equals("shibboleth")) {
+    if (profile.name.equals("shibboleth")) {
+      logger.info("Shibboleth : " + profile.resourceURI);
       gotoWAYF(pod.getSessionID(), request, response);
       return;
     }
 
-    if (profileName.equals("saml2-web-browser-sso")) {
+    if (profile.name.equals("saml2-web-browser-sso")) {
       if ((profile.entityID == null) || (profile.entityID.length() == 0)) {
         // We need an idp parameter for this profile
+        logger.error("SAML2 Web Browser SSO : " + profile.resourceURI + " : missing entityid");
         request.setAttribute("ERROR_ID", "ID_NEED_ALL_PARAMETERS");
-        //request.setAttribute("ERROR_MESSAGE", "saml2-web-browser-sso");
+        request.setAttribute("ERROR_MESSAGE", "missing entityid parameter");
         request.getRequestDispatcher("/WEB-INF/guanxi_sp_guard/jsp/sp_error.jsp").forward(request, response);
         return;
       }
 
+      logger.info("SAML2 Web Browser SSO : " + profile.resourceURI + " : " + profile.entityID);
+
       request.setAttribute("ERROR_ID", "ID_WAYF_WS_ERROR");
-      request.setAttribute("ERROR_MESSAGE", "saml2-web-browser-sso");
+      request.setAttribute("ERROR_MESSAGE", "saml2-web-browser-sso : " + profile.entityID);
       request.getRequestDispatcher("/WEB-INF/guanxi_sp_guard/jsp/sp_error.jsp").forward(request, response);
       return;
     }
