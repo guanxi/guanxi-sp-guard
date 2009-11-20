@@ -15,6 +15,7 @@
   <EngineInfo>
     <AuthConsumerURL>http://localhost/samlengine/shibb/acs</AuthConsumerURL>
     <WAYFLocationService>http://localhost/samlengine/shibb/wayf-location</WAYFLocationService>
+    <SAML2WBSSOService>http://localhost/samlengine/s2/wbsso</SAML2WBSSOService>
     <Timeout>10</Timeout>
   </EngineInfo>
 
