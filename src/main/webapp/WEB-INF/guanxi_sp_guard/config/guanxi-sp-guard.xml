@@ -26,8 +26,13 @@
   <CertificateAlias>webservices</CertificateAlias>
 
   <Profiles>
-    <Profile url="^(/\w*)(/free/.*)" profile="none" />
-    <Profile url="^(/\w*)(/protected/.*)" profile="shibboleth" />
-    <Profile url="^(/\w*)/(s2wbsso)/(.*)(/protected/.*)" profile="saml2-web-browser-sso" />
+    <!-- https://localhost:8443/protectedapp/free/ -->
+    <Profile name="none" path="^(/\w*)(/free/.*)" />
+    <!-- https://localhost:8443/protectedapp/protected/headers.jsp -->
+    <Profile name="shibboleth" path="^(/\w*)(/protected/.*)" />
+    <!-- https://localhost:8443/protectedapp/s2wbsso/test:id/protected/headers.jsp -->
+    <Profile name="saml2-web-browser-sso" binding="rest" path="^(/\w*)/(s2wbsso)/(.*)(/protected/.*)" />
+    <!-- https://localhost:8443/protectedapp/s2wbsso/?entityid=test:id -->
+    <Profile name="saml2-web-browser-sso" path="^(/\w*)(/s2wbsso/.*)" />
   </Profiles>
 </Guard>
