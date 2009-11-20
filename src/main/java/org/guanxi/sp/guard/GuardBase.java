@@ -450,4 +450,24 @@ public abstract class GuardBase implements Filter {
 
     return null;
   }
+
+  protected void gotoWBSSO(String sessionID, String entityID, ServletRequest request, ServletResponse response) {
+    try {
+      String wbssoLocation = guardConfig.getEngineInfo().getSAML2WBSSOService() + "?" + Guanxi.WAYF_PARAM_GUARD_ID + "=" + guardConfig.getGuardInfo().getID();
+      wbssoLocation += "&" + Guanxi.WAYF_PARAM_SESSION_ID + "=" + sessionID;
+      wbssoLocation += "&" + "entityID" + "=" + entityID;
+
+      // Send the user to the WAYF or IdP
+      ((HttpServletResponse)response).sendRedirect(wbssoLocation);
+    }
+    catch (IOException ioe) {
+      logger.error("Engine WAYF Web Service not responding", ioe);
+      request.setAttribute("ERROR_ID", "ID_WAYF_WS_NOT_RESPONDING");
+      request.setAttribute("ERROR_MESSAGE", ioe.getMessage());
+      try {
+        request.getRequestDispatcher("/WEB-INF/guanxi_sp_guard/jsp/sp_error.jsp").forward(request, response);
+      }
+      catch (Exception ex) {}
+    }
+  }
 }
