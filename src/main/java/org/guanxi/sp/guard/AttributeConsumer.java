@@ -240,13 +240,11 @@ public class AttributeConsumer extends HttpServlet {
             // Remove the prefix from the attribute name
             attributeOID = attribute.getName().replaceAll(EduPersonOID.ATTRIBUTE_NAME_PREFIX, "");
 
-            if ((attributeOID.equals(EduPersonOID.OID_EDUPERSON_SCOPED_AFFILIATION)) ||
-                (attributeOID.equals(EduPersonOID.OID_EDUPERSON_TARGETED_ID))) {
+            // Is it a scoped attribute?
+            if (obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE) != null) {
               String attrValue = obj[cc].getDomNode().getFirstChild().getNodeValue();
-              if (obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE) != null) {
-                attrValue += EduPerson.EDUPERSON_SCOPED_DELIMITER;
-                attrValue += obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE).getNodeValue();
-              }
+              attrValue += EduPerson.EDUPERSON_SCOPED_DELIMITER;
+              attrValue += obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE).getNodeValue();
               bag.addAttribute(attribute.getFriendlyName(), attrValue);
             }
             else {
