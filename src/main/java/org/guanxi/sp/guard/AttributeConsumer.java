@@ -144,13 +144,23 @@ public class AttributeConsumer extends HttpServlet {
       // Return success message to the Engine
       soapEnvelopeDoc.save(response.getOutputStream());
     }
-    catch(Exception e) {
-      logger.error(e);
-      throw new ServletException(e);
+    catch(XmlException xe) {
+      logger.error(xe);
+      throw new ServletException(xe);
     }
   }
 
-  private XmlObject unmarshallSAML(EnvelopeDocument soapDoc) throws Exception {
+  /**
+   * Extracts the SAML Response from a SOAP message
+   *
+   * @param soapDoc The SOAP message containing the SAML Response
+   * @return Returns an XmlObject that should be casted to the appropriate version
+   * of SAML Response. Currently, the method returns objects castable to:
+   * org.guanxi.xal.saml_1_0.protocol.ResponseDocument
+   * org.guanxi.xal.saml_2_0.protocol.ResponseDocument
+   * @throws XmlException if an error occurs
+   */
+  private XmlObject unmarshallSAML(EnvelopeDocument soapDoc) throws XmlException {
     // Rake through the SOAP to find the SAML Response...
     NodeList nodes = soapDoc.getEnvelope().getBody().getDomNode().getChildNodes();
     Node samlResponseNode = null;
@@ -170,6 +180,12 @@ public class AttributeConsumer extends HttpServlet {
     }
   }
 
+  /**
+   * Extracts the attributes from a SAML1.1 Response and puts them in a Bag
+   *
+   * @param samlResponseDoc The SAML1.1 Response containing the attributes
+   * @param bag The Bag to add the attributes to
+   */
   private void processSAML1Response(ResponseDocument samlResponseDoc, Bag bag) {
     // Store the raw SAML Response in it as a String
     bag.setSamlResponse(samlResponseDoc.toString());
@@ -209,62 +225,62 @@ public class AttributeConsumer extends HttpServlet {
     }
   }
 
-  private void processSAML2Response(org.guanxi.xal.saml_2_0.protocol.ResponseDocument samlResponseDoc, Bag bag) {
+  /**
+   * Extracts the attributes from a SAML2 Response and puts them in a Bag
+   *
+   * @param samlResponseDoc The SAML2 Response containing the attributes
+   * @param bag The Bag to add the attributes to
+   * @throws XmlException if an error occurs
+   */
+  private void processSAML2Response(org.guanxi.xal.saml_2_0.protocol.ResponseDocument samlResponseDoc, Bag bag) throws XmlException {
     // Store the raw SAML Response in it as a String
     bag.setSamlResponse(samlResponseDoc.toString());
 
-    try {
-      EncryptedElementType[] assertions = samlResponseDoc.getResponse().getEncryptedAssertionArray();
-      for (EncryptedElementType assertion : assertions) {
-        NodeList nodes = assertion.getDomNode().getChildNodes();
-        Node assertionNode = null;
-        for (int c=0; c < nodes.getLength(); c++) {
-          assertionNode = nodes.item(c);
-          if (assertionNode.getLocalName() != null) {
-            if (assertionNode.getLocalName().equals("Assertion"))
-              break;
+    EncryptedElementType[] assertions = samlResponseDoc.getResponse().getEncryptedAssertionArray();
+    for (EncryptedElementType assertion : assertions) {
+      NodeList nodes = assertion.getDomNode().getChildNodes();
+      Node assertionNode = null;
+      for (int c=0; c < nodes.getLength(); c++) {
+        assertionNode = nodes.item(c);
+        if (assertionNode.getLocalName() != null) {
+          if (assertionNode.getLocalName().equals("Assertion"))
+            break;
+        }
+      }
+      if (assertionNode == null) {
+        continue;
+      }
+
+      org.guanxi.xal.saml_2_0.assertion.AssertionDocument ass = org.guanxi.xal.saml_2_0.assertion.AssertionDocument.Factory.parse(assertionNode);
+      org.guanxi.xal.saml_2_0.assertion.AttributeStatementType att = ass.getAssertion().getAttributeStatementArray(0);
+      org.guanxi.xal.saml_2_0.assertion.AttributeType[] attributes = att.getAttributeArray();
+
+      String attributeOID = null;
+      for (org.guanxi.xal.saml_2_0.assertion.AttributeType attribute : attributes) {
+        XmlObject[] obj = attribute.getAttributeValueArray();
+        for (int cc=0; cc < obj.length; cc++) {
+          // Remove the prefix from the attribute name
+          attributeOID = attribute.getName().replaceAll(EduPersonOID.ATTRIBUTE_NAME_PREFIX, "");
+
+          // Is it a scoped attribute?
+          if (obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE) != null) {
+            String attrValue = obj[cc].getDomNode().getFirstChild().getNodeValue();
+            attrValue += EduPerson.EDUPERSON_SCOPED_DELIMITER;
+            attrValue += obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE).getNodeValue();
+            bag.addAttribute(attribute.getFriendlyName(), attrValue);
           }
-        }
-        if (assertionNode == null) {
-          continue;
-        }
-
-        org.guanxi.xal.saml_2_0.assertion.AssertionDocument ass = org.guanxi.xal.saml_2_0.assertion.AssertionDocument.Factory.parse(assertionNode);
-        org.guanxi.xal.saml_2_0.assertion.AttributeStatementType att = ass.getAssertion().getAttributeStatementArray(0);
-        org.guanxi.xal.saml_2_0.assertion.AttributeType[] attributes = att.getAttributeArray();
-
-        String attributeOID = null;
-        for (org.guanxi.xal.saml_2_0.assertion.AttributeType attribute : attributes) {
-          XmlObject[] obj = attribute.getAttributeValueArray();
-          for (int cc=0; cc < obj.length; cc++) {
-            // Remove the prefix from the attribute name
-            attributeOID = attribute.getName().replaceAll(EduPersonOID.ATTRIBUTE_NAME_PREFIX, "");
-
-            // Is it a scoped attribute?
-            if (obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE) != null) {
-              String attrValue = obj[cc].getDomNode().getFirstChild().getNodeValue();
-              attrValue += EduPerson.EDUPERSON_SCOPED_DELIMITER;
-              attrValue += obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE).getNodeValue();
-              bag.addAttribute(attribute.getFriendlyName(), attrValue);
-            }
-            else {
-              if (obj[cc].getDomNode().getFirstChild() != null) {
-                if (obj[cc].getDomNode().getFirstChild().getNodeValue() != null) {
-                  bag.addAttribute(attribute.getFriendlyName(), obj[cc].getDomNode().getFirstChild().getNodeValue());
-                }
-                else {
-                  bag.addAttribute(attribute.getFriendlyName(), "");
-                }
+          else {
+            if (obj[cc].getDomNode().getFirstChild() != null) {
+              if (obj[cc].getDomNode().getFirstChild().getNodeValue() != null) {
+                bag.addAttribute(attribute.getFriendlyName(), obj[cc].getDomNode().getFirstChild().getNodeValue());
+              }
+              else {
+                bag.addAttribute(attribute.getFriendlyName(), "");
               }
             }
           }
         }
-
-        logger.info("");
       }
-    }
-    catch(XmlException xe) {
-      logger.error(xe);
     }
   }
 }
