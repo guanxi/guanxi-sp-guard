@@ -269,19 +269,23 @@ public class AttributeConsumer extends HttpServlet {
             attrValue += EduPerson.EDUPERSON_SCOPED_DELIMITER;
             attrValue += obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE).getNodeValue();
             bag.addAttribute(attribute.getFriendlyName(), attrValue);
+            bag.addAttribute(attributeOID, attrValue);
           }
           // What about eduPersonTargetedID?
           else if (attributeOID.equals(EduPersonOID.OID_EDUPERSON_TARGETED_ID)) {
             NameIDDocument nameIDDoc = NameIDDocument.Factory.parse(obj[cc].getDomNode().getFirstChild());
             bag.addAttribute(attribute.getFriendlyName(), nameIDDoc.getNameID().getStringValue());
+            bag.addAttribute(attributeOID, nameIDDoc.getNameID().getStringValue());
           }
           else {
             if (obj[cc].getDomNode().getFirstChild() != null) {
               if (obj[cc].getDomNode().getFirstChild().getNodeValue() != null) {
                 bag.addAttribute(attribute.getFriendlyName(), obj[cc].getDomNode().getFirstChild().getNodeValue());
+                bag.addAttribute(attributeOID, obj[cc].getDomNode().getFirstChild().getNodeValue());
               }
               else {
                 bag.addAttribute(attribute.getFriendlyName(), "");
+                bag.addAttribute(attributeOID, "");
               }
             }
           }
