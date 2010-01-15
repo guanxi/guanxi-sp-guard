@@ -26,7 +26,8 @@ import java.util.*;
  * The GuardRequest represents the Guard in the browser. It encapsulates all the original Request
  * information and adds attributes as request headers, obtained from an IdP via en Engine.
  *
- * @author Alistair Young alistair@smo.uhi.ac.uk
+ * @author alistair
+ * @author chris
  */
 public class GuardRequest extends HttpServletRequestWrapper {
   Pod requestPod = null;
@@ -111,6 +112,11 @@ public class GuardRequest extends HttpServletRequestWrapper {
   public String getHeader(String name) {
     // Look for the header name as is. If it's not there, try all lower case
     return (headers.get(name) != null) ? (String)headers.get(name) : (String)headers.get(name.toLowerCase());
+  }
+
+  public boolean headersContain(String name)
+  {
+	  return headers.containsKey(name);
   }
 
   public Enumeration<String> getHeaderNames() {
