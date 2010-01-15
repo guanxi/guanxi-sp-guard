@@ -28,6 +28,7 @@ import org.guanxi.xal.saml_1_0.assertion.AssertionType;
 import org.guanxi.xal.saml_1_0.assertion.AttributeStatementType;
 import org.guanxi.xal.saml_1_0.assertion.AttributeType;
 import org.guanxi.xal.saml_2_0.assertion.EncryptedElementType;
+import org.guanxi.xal.saml_2_0.assertion.NameIDDocument;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlException;
@@ -257,17 +258,22 @@ public class AttributeConsumer extends HttpServlet {
 
       String attributeOID = null;
       for (org.guanxi.xal.saml_2_0.assertion.AttributeType attribute : attributes) {
+        // Remove the prefix from the attribute name
+        attributeOID = attribute.getName().replaceAll(EduPersonOID.ATTRIBUTE_NAME_PREFIX, "");
+
         XmlObject[] obj = attribute.getAttributeValueArray();
         for (int cc=0; cc < obj.length; cc++) {
-          // Remove the prefix from the attribute name
-          attributeOID = attribute.getName().replaceAll(EduPersonOID.ATTRIBUTE_NAME_PREFIX, "");
-
           // Is it a scoped attribute?
           if (obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE) != null) {
             String attrValue = obj[cc].getDomNode().getFirstChild().getNodeValue();
             attrValue += EduPerson.EDUPERSON_SCOPED_DELIMITER;
             attrValue += obj[cc].getDomNode().getAttributes().getNamedItem(EduPerson.EDUPERSON_SCOPE_ATTRIBUTE).getNodeValue();
             bag.addAttribute(attribute.getFriendlyName(), attrValue);
+          }
+          // What about eduPersonTargetedID?
+          else if (attributeOID.equals(EduPersonOID.OID_EDUPERSON_TARGETED_ID)) {
+            NameIDDocument nameIDDoc = NameIDDocument.Factory.parse(obj[cc].getDomNode().getFirstChild());
+            bag.addAttribute(attribute.getFriendlyName(), nameIDDoc.getNameID().getStringValue());
           }
           else {
             if (obj[cc].getDomNode().getFirstChild() != null) {
