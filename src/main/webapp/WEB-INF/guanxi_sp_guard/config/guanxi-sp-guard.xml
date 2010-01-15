@@ -15,6 +15,7 @@
   <EngineInfo>
     <AuthConsumerURL>http://localhost/samlengine/shibb/acs</AuthConsumerURL>
     <WAYFLocationService>http://localhost/samlengine/shibb/wayf-location</WAYFLocationService>
+    <SAML2WBSSOService>http://localhost/samlengine/s2/wbsso</SAML2WBSSOService>
     <Timeout>10</Timeout>
   </EngineInfo>
 
@@ -24,4 +25,15 @@
   <Keystore>__GUARD_APP_ROOT__/WEB-INF/guanxi_sp_guard/keystore/guard.jks</Keystore>
   <KeystorePassword>changeme</KeystorePassword>
   <CertificateAlias>webservices</CertificateAlias>
+
+  <Profiles>
+    <!-- https://localhost:8443/protectedapp/free/ -->
+    <Profile name="none" path="^(/\w*)(/free/.*)" />
+    <!-- https://localhost:8443/protectedapp/protected/headers.jsp -->
+    <Profile name="shibboleth" path="^(/\w*)(/protected/.*)" />
+    <!-- https://localhost:8443/protectedapp/s2wbsso/test:id/protected/headers.jsp -->
+    <Profile name="saml2-web-browser-sso" binding="rest" path="^(/\w*)/(s2wbsso)/(.*)(/protected/.*)" />
+    <!-- https://localhost:8443/protectedapp/s2wbsso/?entityid=test:id -->
+    <Profile name="saml2-web-browser-sso" path="^(/\w*)(/s2wbsso/.*)" />
+  </Profiles>
 </Guard>
