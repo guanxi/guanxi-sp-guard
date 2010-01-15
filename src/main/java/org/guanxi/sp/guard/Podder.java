@@ -29,14 +29,15 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 
 /**
- * <font size=5><b></b></font>
+ * Adds a Pod full of attributes to the system
  *
- * @author Alistair Young alistair@smo.uhi.ac.uk
+ * @author alistair
+ * @author chris
  */
 @SuppressWarnings("serial")
 public class Podder extends HttpServlet {
   private static final Logger logger = Logger.getLogger(Podder.class.getName());
-  
+
   /** The config object placed in the servlet context by the Guard filter */
   private org.guanxi.xal.sp.GuardDocument.Guard config = null;
   /** The age of the cookie to set */
@@ -98,9 +99,9 @@ public class Podder extends HttpServlet {
    */
   public void process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     // Sort out the cookie path
-    String cookieDomain = (config.getCookie().getDomain() == null) ? "" : config.getCookie().getDomain();
-    
-    String cookieName = config.getCookie().getPrefix() + FileName.encode(config.getGuardInfo().getID());
+    String cookieDomain = (config.getCookie().getDomain() == null) ? "" : postProcessGetGuardId(config.getCookie().getDomain(),request);
+
+    String cookieName = config.getCookie().getPrefix() + FileName.encode(postProcessGetGuardId(config.getGuardInfo().getID(),request));
 
     // "id" is the sessionID set by the Guard filter
     Pod pod = (Pod)getServletContext().getAttribute(request.getParameter("id"));
@@ -121,5 +122,16 @@ public class Podder extends HttpServlet {
 
     // Redirect to the requested resource. The filter will handle access and attributes
     response.sendRedirect(pod.getRequestScheme() + "://" + pod.getHostName() + pod.getRequestURL());
+  }
+
+  /**
+   * Opportunity for extending filters to dynamically control the guard id
+   *
+   * @param id The current Guard ID
+   * @param httpRequest Servlet request
+   * @return The new Guard ID. Could be the same as the current one
+   */
+  protected String postProcessGetGuardId(String id, HttpServletRequest httpRequest) {
+	  return id;
   }
 }
