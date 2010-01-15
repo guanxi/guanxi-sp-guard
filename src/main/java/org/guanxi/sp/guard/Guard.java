@@ -17,6 +17,7 @@
 package org.guanxi.sp.guard;
 
 import org.guanxi.common.*;
+import org.guanxi.common.filters.FileName;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
@@ -44,6 +45,9 @@ public class Guard extends GuardBase {
                        FilterChain filterChain) throws IOException, ServletException {
     HttpServletRequest httpRequest = (HttpServletRequest)request;
     HttpServletResponse httpResponse = (HttpServletResponse)response;
+
+    // Dynamically determine the cookie name in case it needs to be changed at runtime
+    cookieName = guardConfig.getCookie().getPrefix() + FileName.encode(postProcessGetGuardId(guardConfig.getGuardInfo().getID(), httpRequest));
 
     // Don't block web service calls from a Guanxi SAML Engine
     if (passthru(httpRequest)) {
@@ -85,10 +89,12 @@ public class Guard extends GuardBase {
     // From now it's authenticated profile based access
     Pod podFromCookie = doCookies(httpRequest, httpResponse);
     if (podFromCookie != null) {
-      filterChain.doFilter(new GuardRequest(httpRequest,
-                                            podFromCookie,
-                                            guardConfig.getGuardInfo().getAttributePrefix()),
-                           response);
+      GuardRequest guardRequest = new GuardRequest(httpRequest, podFromCookie,
+                                                   guardConfig.getGuardInfo().getAttributePrefix());
+
+      preSuccessFilterChain(guardRequest);
+      filterChain.doFilter(guardRequest, response);
+      
       return;
     }
 
