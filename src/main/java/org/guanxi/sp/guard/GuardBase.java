@@ -133,7 +133,10 @@ public abstract class GuardBase implements Filter {
     filterConfig.getServletContext().setAttribute(Guanxi.CONTEXT_ATTR_GUARD_COOKIE_NAME,
                                                   guardDoc.getGuard().getCookie().getPrefix() + guardDoc.getGuard().getGuardInfo().getID());
 
+    // Load up the Guard's config
     guardConfig = (org.guanxi.xal.sp.GuardDocument.Guard)filterConfig.getServletContext().getAttribute(Guanxi.CONTEXT_ATTR_GUARD_CONFIG);
+
+    // The cookie name can be changed at runtime
     cookieName = guardConfig.getCookie().getPrefix() + FileName.encode(guardConfig.getGuardInfo().getID());
   }
 
@@ -359,7 +362,7 @@ public abstract class GuardBase implements Filter {
            * own keystore to let the Guard authenticate us.
            */
           EntityConnection engineConnection = new EntityConnection(guardConfig.getEngineInfo().getWAYFLocationService(),
-                                                                   guardConfig.getGuardInfo().getID(),
+                                                                   postProcessGetGuardId(guardConfig.getGuardInfo().getID(), (HttpServletRequest)request),
                                                                    guardConfig.getKeystore(),
                                                                    guardConfig.getKeystorePassword(),
                                                                    guardConfig.getTrustStore(),
@@ -415,10 +418,10 @@ public abstract class GuardBase implements Filter {
      */
     String wayfLocation = null;
     try {
-      String queryString = guardConfig.getEngineInfo().getWAYFLocationService() + "?" + Guanxi.WAYF_PARAM_GUARD_ID + "=" + guardConfig.getGuardInfo().getID();
+      String queryString = guardConfig.getEngineInfo().getWAYFLocationService() + "?" + Guanxi.WAYF_PARAM_GUARD_ID + "=" + postProcessGetGuardId(guardConfig.getGuardInfo().getID(), (HttpServletRequest)request);
       queryString += "&" + Guanxi.WAYF_PARAM_SESSION_ID + "=" + sessionID;
       EntityConnection wayfService = new EntityConnection(queryString,
-                                                          guardConfig.getGuardInfo().getID(),
+                                                          postProcessGetGuardId(guardConfig.getGuardInfo().getID(), (HttpServletRequest)request),
                                                           guardConfig.getKeystore(),
                                                           guardConfig.getKeystorePassword(),
                                                           guardConfig.getTrustStore(),
@@ -446,7 +449,7 @@ public abstract class GuardBase implements Filter {
       wayfLocation += "?shire=" + URLEncoder.encode(guardConfig.getEngineInfo().getAuthConsumerURL(), "UTF-8");
       wayfLocation += "&target=" + URLEncoder.encode(sessionID, "UTF-8");
       wayfLocation += "&time=" + (System.currentTimeMillis() / 1000);
-      wayfLocation += "&providerId=" + URLEncoder.encode(guardConfig.getGuardInfo().getID(), "UTF-8");
+      wayfLocation += "&providerId=" + postProcessGetGuardId(guardConfig.getGuardInfo().getID(), (HttpServletRequest)request);
 
       // Send the user to the WAYF or IdP
       ((HttpServletResponse)response).sendRedirect(wayfLocation);
@@ -472,9 +475,10 @@ public abstract class GuardBase implements Filter {
   protected boolean passthru(HttpServletRequest httpRequest) {
     // Don't block web service calls from a Guanxi SAML Engine
     if ((httpRequest.getRequestURI().endsWith("guard.sessionVerifier")) ||
-        (httpRequest.getRequestURI().endsWith("guard.guanxiGuardACS")) ||
-        (httpRequest.getRequestURI().endsWith("guard.guanxiGuardlogout")) ||
-        (httpRequest.getRequestURI().endsWith("guard.guanxiGuardPodder"))) {
+    		(httpRequest.getRequestURI().endsWith("guard.guanxiGuardACS")) ||
+    		(httpRequest.getRequestURI().endsWith(getLogoutPage(httpRequest))) ||
+    		(httpRequest.getRequestURI().endsWith("guard.guanxiGuardPodder")) ||
+    		checkSkipFilter(httpRequest)) {
       return true;
     }
 
@@ -557,5 +561,45 @@ public abstract class GuardBase implements Filter {
       }
       catch (Exception ex) {}
     }
+  }
+
+  /**
+   * Opportunity for extending filters to do some work before calling the next filter in the chain
+   *
+   * @param request the current request
+   * @return the URL of the logout page
+   */
+  protected String getLogoutPage(HttpServletRequest request) {
+	  return "guard.guanxiGuardlogout";
+  }
+
+  /**
+   * Opportunity for extending filters to bypass Guard filtering
+   *
+   * @param request the current request
+   * @return true if the current request should be free of Guard interference
+   */
+  protected boolean checkSkipFilter(HttpServletRequest request) {
+	  return false;
+  }
+
+  /**
+   * Opportunity for extending filters to do some work before calling the next filter in the chain
+   *
+   * @param guardRequest the current request
+   */
+  protected void preSuccessFilterChain(GuardRequest guardRequest) {
+	  //override to do application specific setup
+  }
+
+  /**
+   * Opportunity for extending filters to dynamically control the guard id
+   *
+   * @param id the current ID of the Guard
+   * @param httpRequest Servlet request
+   * @return the new ID of the Guard. Could be the same as the current ID.
+   */
+  protected String postProcessGetGuardId(String id, HttpServletRequest httpRequest) {
+	  return id;
   }
 }
