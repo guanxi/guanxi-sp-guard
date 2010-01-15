@@ -43,6 +43,11 @@ import java.net.URLEncoder;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
+/**
+ * Base class for Guards
+ *
+ * @author alistair
+ */
 public abstract class GuardBase implements Filter {
   /** Our logger */
   protected Logger logger = null;
@@ -52,7 +57,9 @@ public abstract class GuardBase implements Filter {
   protected FilterConfig filterConfig = null;
   /** Indicates if we can unload the BouncyCastle security provider */
   protected boolean okToUnloadBCProvider = false;
+  /** The Guard's config */
   protected org.guanxi.xal.sp.GuardDocument.Guard guardConfig = null;
+  /** The name of the cookie the Guard uses to store a Pod of attributes */
   protected String cookieName = null;
 
   /**
@@ -68,9 +75,24 @@ public abstract class GuardBase implements Filter {
     }
   }
 
+  /**
+   * The Guard's entry point from the servlet container. This is where the action happens.
+   * All extending classes must implement this method.
+   *
+   * @param request Servlet request
+   * @param response Servlet response
+   * @param filterChain the filter chain
+   * @throws IOException if an error occurs
+   * @throws ServletException if an error occurs
+   */
   public abstract void doFilter(ServletRequest request, ServletResponse response,
                                 FilterChain filterChain) throws IOException, ServletException;
 
+  /**
+   * Does all the base class initialisation
+   *
+   * @param config The Guard's config
+   */
   protected void initBase(FilterConfig config) {
     logger = Logger.getLogger(this.getClass().getName());
 
@@ -115,6 +137,9 @@ public abstract class GuardBase implements Filter {
     cookieName = guardConfig.getCookie().getPrefix() + FileName.encode(guardConfig.getGuardInfo().getID());
   }
 
+  /**
+   * Adds the security provider to the list of available ones
+   */
   protected void loadSecurityProvider() {
     /* If we try to add the BouncyCastle provider but another Guanxi::Guard running
      * in another webapp in the same container has already done so, then we'll get
@@ -127,6 +152,9 @@ public abstract class GuardBase implements Filter {
     }
   }
 
+  /**
+   * Removes the security provider from the list of available ones
+   */
   protected void unloadSecurityProvider() {
     if (okToUnloadBCProvider) {
       Provider[] providers = Security.getProviders();
@@ -151,6 +179,11 @@ public abstract class GuardBase implements Filter {
     }
   }
 
+  /**
+   * Creates a keystore for communicating with the Engine over SSL. The Guard never
+   * talks to IdPs, that's the Engine's job, so all SSL comms between Guard and Engine
+   * use self signed certs as they both trust each other.
+   */
   protected void initKeystore() {
     /* If we don't have a keystore, create a self signed one now. The keystore will hold
      * our private key and public key certificate in case we need to communicate with an
@@ -172,6 +205,9 @@ public abstract class GuardBase implements Filter {
     }
   }
 
+  /**
+   * Creates a truststore to store the Engine's SSL certificate
+   */
   protected void initTruststore() {
     // Create a truststore if one doesn't exist
     File trustStoreFile = new File(guardConfig.getTrustStore());
@@ -227,6 +263,14 @@ public abstract class GuardBase implements Filter {
     }
   }
 
+  /**
+   * Processes the cookies in the request, cleaning up any Guard ones that are devoid
+   * of Pods.
+   *
+   * @param httpRequest Servlet request
+   * @param httpResponse Servlet response
+   * @return Pod object if one is referenced by a cookie and it's a valid Pod
+   */
   protected Pod doCookies(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
     Cookie[] cookies = httpRequest.getCookies();
     if (cookies != null) {
@@ -256,6 +300,12 @@ public abstract class GuardBase implements Filter {
     return null;
   }
 
+  /**
+   * Creates and configures a Pod, ready for population with attributes.
+   *
+   * @param request Servlet request
+   * @return An empty Pod configured for use with the Guard
+   */
   protected Pod createPod(ServletRequest request) {
     HttpServletRequest httpRequest = (HttpServletRequest)request;
 
@@ -289,6 +339,15 @@ public abstract class GuardBase implements Filter {
     return pod;
   }
 
+  /**
+   * Initialises the SSL trust with the Engine. The Guard probes for the Engine's SSL certificate
+   * and puts it in its truststore.
+   *
+   * @param request Servlet request
+   * @param response Servlet response
+   * @throws ServletException if an error occurs
+   * @throws IOException if an error occurs
+   */
   protected void initEngineComms(ServletRequest request, ServletResponse response) throws ServletException, IOException {
     if (filterConfig.getServletContext().getAttribute(guardConfig.getGuardInfo().getID() + "SECURE_CHECK_DONE") == null) {
       try {
@@ -342,6 +401,14 @@ public abstract class GuardBase implements Filter {
     }
   }
 
+  /**
+   * Redirects to the Shibboleth WAYF, or direct to an IdP, depending on the Guard's configuration at
+   * the Engine. This is only used in the Shibboleth SAML profile.
+   *
+   * @param sessionID The current session ID
+   * @param request Servlet request
+   * @param response Servlet response
+   */
   protected void gotoWAYF(String sessionID, ServletRequest request, ServletResponse response) {
     /* Call the Engine's web service to set up a session and get the location of the WAYF.
      * If there isn't a WAYF, this will just be the location of the IdP.
@@ -395,6 +462,13 @@ public abstract class GuardBase implements Filter {
     }
   }
 
+  /**
+   * Determines whether to invoke the Guard logic on a request.
+   *
+   * @param httpRequest Servlet request
+   * @return true if the Guard logic should not be invoked, otherwise false to follow the
+   * current profile
+   */
   protected boolean passthru(HttpServletRequest httpRequest) {
     // Don't block web service calls from a Guanxi SAML Engine
     if ((httpRequest.getRequestURI().endsWith("guard.sessionVerifier")) ||
@@ -407,6 +481,12 @@ public abstract class GuardBase implements Filter {
     return false;
   }
 
+  /**
+   * Determines which profile to use to protect the resource.
+   *
+   * @param httpRequest Servlet request
+   * @return Profile object describing the SAML2 profile to use
+   */
   protected Profile getProfile(HttpServletRequest httpRequest) {
     Pattern pattern = null;
     Matcher matcher = null;
@@ -451,6 +531,14 @@ public abstract class GuardBase implements Filter {
     return null;
   }
 
+  /**
+   * Redirects to the SAML2 Web Browser SSO endpoint at the Engine.
+   *
+   * @param sessionID The current session ID
+   * @param entityID The IdP's entityID
+   * @param request Servlet request
+   * @param response Servlet response
+   */
   protected void gotoWBSSO(String sessionID, String entityID, ServletRequest request, ServletResponse response) {
     try {
       String wbssoLocation = guardConfig.getEngineInfo().getSAML2WBSSOService() + "?" + Guanxi.WAYF_PARAM_GUARD_ID + "=" + guardConfig.getGuardInfo().getID();
