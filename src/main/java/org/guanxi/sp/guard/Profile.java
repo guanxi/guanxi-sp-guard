@@ -24,6 +24,8 @@ package org.guanxi.sp.guard;
 public class Profile {
   /** The name of the profile */
   public String name = null;
+  /** The binding to use with the profile */
+  public String binding = null;
   /** The entityID of the actor who is accessing the resource */
   public String entityID = null;
   /** The path of the resource being accessed */
