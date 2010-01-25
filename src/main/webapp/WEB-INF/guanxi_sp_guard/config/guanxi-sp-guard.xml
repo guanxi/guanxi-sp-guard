@@ -32,8 +32,10 @@
     <!-- https://localhost:8443/protectedapp/protected/headers.jsp -->
     <Profile name="shibboleth" path="^(/\w*)(/protected/.*)" />
     <!-- https://localhost:8443/protectedapp/s2wbsso/test:id/protected/headers.jsp -->
-    <Profile name="saml2-web-browser-sso" binding="rest" path="^(/\w*)/(s2wbsso)/(.*)(/protected/.*)" />
+    <Profile name="saml2-web-browser-sso" format="rest" path="^(/\w*)/(s2wbsso)/(.*)(/protected/.*)" />
     <!-- https://localhost:8443/protectedapp/s2wbsso/?entityid=test:id -->
-    <Profile name="saml2-web-browser-sso" path="^(/\w*)(/s2wbsso/.*)" />
+    <Profile name="saml2-web-browser-sso" binding="http-post" path="^(/\w*)(/s2wbsso/.*)" />
+    <!-- https://localhost:8443/protectedapp/s2wbsso-redirect/?entityid=test:id -->
+    <Profile name="saml2-web-browser-sso" binding="http-redirect" path="^(/\w*)(/s2wbsso-redirect/.*)" />
   </Profiles>
 </Guard>
