@@ -512,10 +512,14 @@ public abstract class GuardBase implements Filter {
           profile.resourceURI = matcher.group(1) + matcher.group(2);
         }
 
+        if (guardProfile.getBinding() != null) {
+          profile.binding = guardProfile.getBinding();
+        }
+
         if (guardProfile.getName().equals("saml2-web-browser-sso")) {
           // The entityID can come from the URL itself or a query param
-          if (guardProfile.getBinding() != null) {
-            if (guardProfile.getBinding().equalsIgnoreCase("rest")) {
+          if (guardProfile.getFormat() != null) {
+            if (guardProfile.getFormat().equalsIgnoreCase("rest")) {
               // app/s2wbsso/entityid/resource ...
               profile.entityID = matcher.group(3);
               profile.resourceURI = matcher.group(1) + matcher.group(4);
@@ -539,15 +543,19 @@ public abstract class GuardBase implements Filter {
    * Redirects to the SAML2 Web Browser SSO endpoint at the Engine.
    *
    * @param sessionID The current session ID
-   * @param entityID The IdP's entityID
+   * @param profile The profile to use
    * @param request Servlet request
    * @param response Servlet response
    */
-  protected void gotoWBSSO(String sessionID, String entityID, ServletRequest request, ServletResponse response) {
+  protected void gotoWBSSO(String sessionID, Profile profile, ServletRequest request, ServletResponse response) {
     try {
-      String wbssoLocation = guardConfig.getEngineInfo().getSAML2WBSSOService() + "?" + Guanxi.WAYF_PARAM_GUARD_ID + "=" + guardConfig.getGuardInfo().getID();
+      String wbssoLocation = guardConfig.getEngineInfo().getSAML2WBSSOService();
+      wbssoLocation += "?" + Guanxi.WAYF_PARAM_GUARD_ID + "=" + guardConfig.getGuardInfo().getID();
+      if (profile.binding != null) {
+        wbssoLocation += "&" + Guanxi.WAYF_PARAM_GUARD_BINDING + "=" + profile.binding;
+      }
       wbssoLocation += "&" + Guanxi.WAYF_PARAM_SESSION_ID + "=" + sessionID;
-      wbssoLocation += "&" + "entityID" + "=" + entityID;
+      wbssoLocation += "&" + "entityID" + "=" + profile.entityID;
 
       // Send the user to the WAYF or IdP
       ((HttpServletResponse)response).sendRedirect(wbssoLocation);
