@@ -122,7 +122,7 @@ public class Guard extends GuardBase {
       }
 
       logger.info("SAML2 Web Browser SSO : " + profile.resourceURI + " : " + profile.entityID);
-      gotoWBSSO(pod.getSessionID(), profile.entityID, request, response);
+      gotoWBSSO(pod.getSessionID(), profile, request, response);
       return;
     }
   }
