@@ -112,7 +112,7 @@ public class Guard extends GuardBase {
     }
 
     if (profile.name.equals("saml2-web-browser-sso")) {
-      if ((profile.entityID == null) || (profile.entityID.length() == 0)) {
+      if ((profile.entityID == null) && (profile.defaultEntityID == null)) {
         // We need an idp parameter for this profile
         logger.error("SAML2 Web Browser SSO : " + profile.resourceURI + " : missing entityid");
         request.setAttribute("ERROR_ID", "ID_NEED_ALL_PARAMETERS");
