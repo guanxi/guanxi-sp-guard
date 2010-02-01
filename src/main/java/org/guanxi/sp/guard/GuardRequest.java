@@ -130,4 +130,8 @@ public class GuardRequest extends HttpServletRequestWrapper {
   public Cookie[] getCookies() {
     return cookies;
   }
+
+  public void setGuardCookieName(String guardCookieName) {
+    headers.put("GUANXI_GUARD_COOKIE_NANE", guardCookieName);
+  }
 }
