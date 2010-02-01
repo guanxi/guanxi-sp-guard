@@ -91,6 +91,7 @@ public class Guard extends GuardBase {
     if (podFromCookie != null) {
       GuardRequest guardRequest = new GuardRequest(httpRequest, podFromCookie,
                                                    guardConfig.getGuardInfo().getAttributePrefix());
+      guardRequest.setGuardCookieName(cookieName);
 
       preSuccessFilterChain(guardRequest);
       filterChain.doFilter(guardRequest, response);
