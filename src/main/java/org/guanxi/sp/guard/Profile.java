@@ -26,6 +26,8 @@ public class Profile {
   public String name = null;
   /** The binding to use with the profile */
   public String binding = null;
+  /** The default entityID of the actor who is accessing the resource */
+  public String defaultEntityID = null;
   /** The entityID of the actor who is accessing the resource */
   public String entityID = null;
   /** The path of the resource being accessed */
