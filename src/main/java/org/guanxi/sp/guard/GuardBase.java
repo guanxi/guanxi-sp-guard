@@ -200,7 +200,8 @@ public abstract class GuardBase implements Filter {
                                           guardConfig.getKeystore(),
                                           guardConfig.getKeystorePassword(),
                                           guardConfig.getKeystorePassword(),
-                                          guardConfig.getGuardInfo().getID()); // alias for certificate
+                                          guardConfig.getGuardInfo().getID(), // alias for certificate
+                                          guardConfig.getKeyType());
       }
       catch (GuanxiException ge) {
         logger.error("Can't create self signed keystore - secure Engine comms won't be available : ", ge);
@@ -527,6 +528,7 @@ public abstract class GuardBase implements Filter {
           }
           else {
             // app/resource/?entityid= ...
+            profile.defaultEntityID = guardProfile.getDefaultID();
             profile.entityID = httpRequest.getParameter("entityid");
             profile.resourceURI = matcher.group(1) + matcher.group(2);
           }
@@ -555,7 +557,14 @@ public abstract class GuardBase implements Filter {
         wbssoLocation += "&" + Guanxi.WAYF_PARAM_GUARD_BINDING + "=" + profile.binding;
       }
       wbssoLocation += "&" + Guanxi.WAYF_PARAM_SESSION_ID + "=" + sessionID;
-      wbssoLocation += "&" + "entityID" + "=" + profile.entityID;
+      
+      // If there isn't an entityID specified, use the default
+      if (profile.entityID != null) {
+        wbssoLocation += "&" + "entityID" + "=" + profile.entityID;
+      }
+      else {
+        wbssoLocation += "&" + "entityID" + "=" + profile.defaultEntityID;
+      }
 
       // Send the user to the WAYF or IdP
       ((HttpServletResponse)response).sendRedirect(wbssoLocation);
