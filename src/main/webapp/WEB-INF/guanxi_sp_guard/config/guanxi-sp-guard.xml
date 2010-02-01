@@ -25,6 +25,7 @@
   <Keystore>__GUARD_APP_ROOT__/WEB-INF/guanxi_sp_guard/keystore/guard.jks</Keystore>
   <KeystorePassword>changeme</KeystorePassword>
   <CertificateAlias>webservices</CertificateAlias>
+  <KeyType>RSA</KeyType>
 
   <Profiles>
     <!-- https://localhost:8443/protectedapp/free/ -->
