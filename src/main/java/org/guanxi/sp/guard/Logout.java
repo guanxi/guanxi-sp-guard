@@ -16,8 +16,7 @@
 
 package org.guanxi.sp.guard;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.guanxi.common.Pod;
 import org.guanxi.common.definitions.Guanxi;
 import org.guanxi.common.filters.FileName;
@@ -41,7 +40,7 @@ import java.io.IOException;
 @SuppressWarnings("serial")
 public class Logout extends HttpServlet {
 
-	private Log logger = LogFactory.getLog(getClass());
+	private Logger logger = Logger.getLogger(Logout.class.getName());
 
   public void init() throws ServletException {
   }
