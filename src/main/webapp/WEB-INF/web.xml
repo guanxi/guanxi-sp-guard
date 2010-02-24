@@ -29,10 +29,10 @@
     </init-param>
   </filter>
 
-  <!-- Hook everything. Access restrictions are controlled in Guard config file -->
+  <!-- Hook the protected dir -->
   <filter-mapping>
     <filter-name>Guanxi Resource Guard</filter-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/protected/*</url-pattern>
   </filter-mapping>
 
   <!-- Guanxi Guard Session Verifier Service -->
