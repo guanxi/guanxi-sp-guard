@@ -2,4 +2,4 @@
 # web server that is capable of allowing the use of overrides specified in this file.
 
 # This is the full path to the Guanxi PHP Guard
-php_value auto_prepend_file /var/WWW/site/htdocs/gxrest/GuanxiGuard.php
+php_value auto_prepend_file /var/WWW/site/htdocs/gxrest/guanxi_sp_guard/GuanxiGuard.php

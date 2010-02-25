@@ -23,8 +23,8 @@
  * Displays the attributes and raw SAML Response
  */
 
-include "config.php";
-require_once "utils.php";
+include "guanxi_sp_guard/config.php";
+require_once "guanxi_sp_guard/utils.php";
 
 session_start();
 
