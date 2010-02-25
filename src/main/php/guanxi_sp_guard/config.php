@@ -31,7 +31,7 @@ define(GUARD_ID, "sgarbh-phpguard");
 /** The URL of the Engine's GPS Service */
 define(ENGINE_GPS_SERVICE, "https://your.guanxi.engine.com/samlengine/gps");
 /** Where the sessions are to be created. This directory must be writeable to the web server. */
-define(SESSION_IDS_DIR, "/var/www/htdocs/gxrest/guanxi_sp_guard/sessions/");
+define(SESSION_IDS_DIR, "/var/www/htdocs/protected/guanxi_sp_guard/sessions/");
 /** The path for the session cookie */
 define(COOKIE_PATH, "/");
 /** The lifetime for the session cookie in milliseconds. -1 means a transient cookie which will disappear
@@ -43,7 +43,7 @@ define(COOKIE_LIFETIME, "-1");
 
 /** The index in the session data of the session ID */
 define(SESSION_VAR_SESSION_ID, "id");
-/** The index in the session data of the originally requested page's URL, e.g. /gxrest/headers.php */
+/** The index in the session data of the originally requested page's URL, e.g. /protected/headers.php */
 define(SESSION_VAR_URL, "url");
 /** The index in the session data of the marker that denotes whether the session has be authorised.
 The Attribute Consumer Service sets this based on attributes it gets from the Engine. */

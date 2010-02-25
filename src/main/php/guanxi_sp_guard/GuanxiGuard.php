@@ -38,9 +38,7 @@ if(isset($_SESSION[SESSION_VAR_SESSION_ID])) {
 	}
 }
 
-/* Let the request through if it's one of the Guanxi services
- * $_SERVER[REQUEST_URI] = /gxrest/headers.php for example
- */
+// Let the request through if it's one of the Guanxi services
 $serviceName = getServiceName($_SERVER[REQUEST_URI]);
 if (($serviceName == "GuanxiAttributeConsumerService.php") ||
     ($serviceName == "GuanxiPodderService.php") ||
