@@ -21,6 +21,12 @@
  * headers.jsp
  *
  * Displays the attributes and raw SAML Response
+ *
+ * To access using Shibboleth:
+ * https://your.site.com/protected/
+ *
+ * To access using SAML2 Web Browser SSO:
+ * https://your.site.com/protected?entityID=IDP_ENTITY_ID
  */
 
 include "guanxi_sp_guard/config.php";
