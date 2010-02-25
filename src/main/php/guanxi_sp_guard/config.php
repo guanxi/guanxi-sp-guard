@@ -31,7 +31,7 @@ define(GUARD_ID, "sgarbh-phpguard");
 /** The URL of the Engine's GPS Service */
 define(ENGINE_GPS_SERVICE, "https://your.guanxi.engine.com/samlengine/gps");
 /** Where the sessions are to be created. This directory must be writeable to the web server. */
-define(SESSION_IDS_DIR, "sessions/");
+define(SESSION_IDS_DIR, "/var/www/htdocs/gxrest/guanxi_sp_guard/sessions/");
 /** The path for the session cookie */
 define(COOKIE_PATH, "/");
 /** The lifetime for the session cookie in milliseconds. -1 means a transient cookie which will disappear
