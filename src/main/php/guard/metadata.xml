@@ -22,9 +22,9 @@ Of if you want to register the Guard manually:
   <RoleDescriptor>
     <Extensions>
       <gxmeta:GuanxiGuardService>
-        <gxmeta:VerifierURL>https://your.site.com/protected/GuanxiSessionVerifierService.php</gxmeta:VerifierURL>
-        <gxmeta:AttributeConsumerServiceURL>https://your.site.com/protected/GuanxiAttributeConsumerService.php</gxmeta:AttributeConsumerServiceURL>
-        <gxmeta:PodderURL>https://your.site.com/protected/GuanxiPodderService.php</gxmeta:PodderURL>
+        <gxmeta:VerifierURL>https://your.site.com/protected/guanxi_sp_guard/GuanxiSessionVerifierService.php</gxmeta:VerifierURL>
+        <gxmeta:AttributeConsumerServiceURL>https://your.site.com/protected/guanxi_sp_guard/GuanxiAttributeConsumerService.php</gxmeta:AttributeConsumerServiceURL>
+        <gxmeta:PodderURL>https://your.site.com/protected/guanxi_sp_guard/GuanxiPodderService.php</gxmeta:PodderURL>
         <gxmeta:Keystore>/var/sgarbh-phpguard.jks</gxmeta:Keystore>
         <gxmeta:KeystorePassword>password</gxmeta:KeystorePassword>
       </gxmeta:GuanxiGuardService>
