@@ -1,0 +1,96 @@
+<!--
+This is a sample metadata file for use with a Guanxi Engine.
+
+Things to change:
+  gxmeta:VerifierURL
+  gxmeta:AttributeConsumerServiceURL
+  gxmeta:PodderURL
+  gxmeta:Keystore
+  gxmeta:KeystorePassword
+  AssertionConsumerService/Location
+
+The Engine will generate this file and Java keystore automcatically when you
+register the Guard:
+  https://YOUR_ENGINE_URL/samlengine/register/guard
+
+Of if you want to register the Guard manually:
+  http://www.guanxi.uhi.ac.uk/index.php/Tutorials/Getting_a_Guard_certificate
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:gxmeta="urn:guanxi:metadata" xmlns:xd="http://www.w3.org/2000/09/xmldsig#"
+                  entityID="sgarbh-phpguard">
+  <RoleDescriptor>
+    <Extensions>
+      <gxmeta:GuanxiGuardService>
+        <gxmeta:VerifierURL>https://your.site.com/protected/GuanxiSessionVerifierService.php</gxmeta:VerifierURL>
+        <gxmeta:AttributeConsumerServiceURL>https://your.site.com/protected/GuanxiAttributeConsumerService.php</gxmeta:AttributeConsumerServiceURL>
+        <gxmeta:PodderURL>https://your.site.com/protected/GuanxiPodderService.php</gxmeta:PodderURL>
+        <gxmeta:Keystore>/var/sgarbh-phpguard.jks</gxmeta:Keystore>
+        <gxmeta:KeystorePassword>password</gxmeta:KeystorePassword>
+      </gxmeta:GuanxiGuardService>
+    </Extensions>
+  </RoleDescriptor>
+  <SPSSODescriptor>
+    <KeyDescriptor use="signing">
+      <xd:KeyInfo>
+        <xd:X509Data>
+          <xd:X509Certificate>
+            MIICvzCCAiigAwIBAgIGAScFLx+0MA0GCSqGSIb3DQEBCwUAMCIxIDAeBgNVBAMM
+            F0d1YW54aS5FbmdpbmUubG9jYWxob3N0MB4XDTEwMDIyNTEyNDIwNloXDTEwMDMx
+            NzEyNTIwNlowbjELMAkGA1UEBhMCR0IxEjAQBgNVBAgTCUhpZ2hsYW5kczEVMBMG
+            A1UEBwwMSXNsZSBvZiBTa3llMQwwCgYDVQQKEwNVSEkxDDAKBgNVBAsTA1dXVzEY
+            MBYGA1UEAxMPc2dhcmJoLXBocGd1YXJkMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCB
+            iQKBgQDjvOzKqrgxyZLWDK0PCJ5TJ9JbfokYKLhjhyu7L3AGfHE8vWCCqp7u9NW6
+            xNiGHprha0kAlmBVgC1KM90w4aCUn7mgPU/cbo3HsHMPA2su3ovbqSKpPwAHz+Ng
+            od4ADC6TtyxOEPsM2nlwrh6Fj/0bVdhrYiYtjMblQVsvVWpFywIDAQABo4GzMIGw
+            MFkGA1UdIwRSMFCAFJ3STKZb+e3mXrI5psjjNGFe/Z4yoSakJDAiMSAwHgYDVQQD
+            DBdHdWFueGkuRW5naW5lLmxvY2FsaG9zdIIQI2QkbBW0eeEMYKY7fd5qwTAdBgNV
+            HQ4EFgQUbMgKqWoUXnpC22B25P13finVNgQwDAYDVR0TAQH/BAIwADAOBgNVHQ8B
+            Af8EBAMCBaAwFgYDVR0lAQH/BAwwCgYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQAD
+            gYEAMr6xTYXMZKISCTDlBdqYZgdXoX6DsuS6BMdiwYNXTvzrsvmGsTSewdWMcnOK
+            qltM3vK0nPvtG7m4NNeoKe7sbfDpJlEBVuBRtPD7RW0C9pC3/NUO0Y4kVU14yCkH
+            HnDn1IxxzVp/50yGeFVXvUA+hUc7qSISGb7+wskS/KZp8hM=
+          </xd:X509Certificate>
+        </xd:X509Data>
+      </xd:KeyInfo>
+    </KeyDescriptor>
+    <KeyDescriptor use="encryption">
+      <xd:KeyInfo>
+        <xd:X509Data>
+          <xd:X509Certificate>
+            MIICvzCCAiigAwIBAgIGAScFLx+0MA0GCSqGSIb3DQEBCwUAMCIxIDAeBgNVBAMM
+            F0d1YW54aS5FbmdpbmUubG9jYWxob3N0MB4XDTEwMDIyNTEyNDIwNloXDTEwMDMx
+            NzEyNTIwNlowbjELMAkGA1UEBhMCR0IxEjAQBgNVBAgTCUhpZ2hsYW5kczEVMBMG
+            A1UEBwwMSXNsZSBvZiBTa3llMQwwCgYDVQQKEwNVSEkxDDAKBgNVBAsTA1dXVzEY
+            MBYGA1UEAxMPc2dhcmJoLXBocGd1YXJkMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCB
+            iQKBgQDjvOzKqrgxyZLWDK0PCJ5TJ9JbfokYKLhjhyu7L3AGfHE8vWCCqp7u9NW6
+            xNiGHprha0kAlmBVgC1KM90w4aCUn7mgPU/cbo3HsHMPA2su3ovbqSKpPwAHz+Ng
+            od4ADC6TtyxOEPsM2nlwrh6Fj/0bVdhrYiYtjMblQVsvVWpFywIDAQABo4GzMIGw
+            MFkGA1UdIwRSMFCAFJ3STKZb+e3mXrI5psjjNGFe/Z4yoSakJDAiMSAwHgYDVQQD
+            DBdHdWFueGkuRW5naW5lLmxvY2FsaG9zdIIQI2QkbBW0eeEMYKY7fd5qwTAdBgNV
+            HQ4EFgQUbMgKqWoUXnpC22B25P13finVNgQwDAYDVR0TAQH/BAIwADAOBgNVHQ8B
+            Af8EBAMCBaAwFgYDVR0lAQH/BAwwCgYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQAD
+            gYEAMr6xTYXMZKISCTDlBdqYZgdXoX6DsuS6BMdiwYNXTvzrsvmGsTSewdWMcnOK
+            qltM3vK0nPvtG7m4NNeoKe7sbfDpJlEBVuBRtPD7RW0C9pC3/NUO0Y4kVU14yCkH
+            HnDn1IxxzVp/50yGeFVXvUA+hUc7qSISGb7+wskS/KZp8hM=
+          </xd:X509Certificate>
+        </xd:X509Data>
+      </xd:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService index="0" Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="YOUR_ENGINE_URL/samlengine/shibb/acs"/>
+    <AssertionConsumerService index="1" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="YOUR_ENGINE_URL/samlengine/s2/wbsso/acs"/>
+    <AssertionConsumerService index="2" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="YOUR_ENGINE_URL/samlengine/s2/wbsso/acs"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">codeBrane</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">codeBrane</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://codebrane.com/</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>codeBrane</Company>
+    <GivenName>Alistair</GivenName>
+    <SurName>Young</SurName>
+    <EmailAddress>alistair@codebrane.com</EmailAddress>
+    <TelephoneNumber>1234</TelephoneNumber>
+  </ContactPerson>
+</EntityDescriptor>
