@@ -22,13 +22,13 @@
  *
  * This is a PHP implementation of a Guanxi Guard.
  */
- 
+
 include "config.php";
 require_once "utils.php";
 
 session_start();
 
-// Check if the ACS has already processed the attributes and made a decision
+// Check if the ACS has already processed the attributes
 if(isset($_SESSION[SESSION_VAR_SESSION_ID])) {
 	if (isSession($_SESSION[SESSION_VAR_SESSION_ID])) {
 		$sessionData = loadSession($_SESSION[SESSION_VAR_SESSION_ID]);
@@ -45,8 +45,7 @@ $serviceName = getServiceName($_SERVER[REQUEST_URI]);
 if (($serviceName == "GuanxiAttributeConsumerService.php") ||
     ($serviceName == "GuanxiPodderService.php") ||
     ($serviceName == "GuanxiGuard.php") ||
-    ($serviceName == "GuanxiSessionVerifierService.php") ||
-    ($serviceName == "error.php")) {
+    ($serviceName == "GuanxiSessionVerifierService.php")) {
   return;
 }
 
@@ -60,24 +59,14 @@ $sessionData[SESSION_VAR_SESSION_ID] = $_SESSION[SESSION_VAR_SESSION_ID];
 $sessionData[SESSION_VAR_URL] = $_SESSION[SESSION_VAR_URL];
 saveSession($_SESSION);
 
-// Call the Engine's WAYF location service
-$restWS = ENGINE_WAYF_LOCATION_SERVICE;
-$restWS .= "?guardid=".GUARD_ID;
-$restWS .= "&sessionid=".$_SESSION[SESSION_VAR_SESSION_ID];
-$result = @file($restWS);
-
-if ($result[0] == "") {
-	header("Location: error.php?errorCode=WAYF_LOCATION_SERVICE_ERROR");
-	return;
+// Redirect to the Engine's GPS service
+$gpsURL = ENGINE_GPS_SERVICE;
+$gpsURL .= "?guardid=".GUARD_ID;
+$gpsURL .= "&sessionid=".$_SESSION[SESSION_VAR_SESSION_ID];
+if ($HTTP_GET_VARS['entityID'] != "") {
+	$gpsURL .= "&entityID=".$HTTP_GET_VARS['entityID'];
 }
 
-// Construct the WAYF URL with the extra shibboleth paramters
-$wayf = $result[0];
-$wayf .= "?shire=".ENGINE_AUTH_CONSUMER_SERVICE;
-$wayf .= "&target=".$_SESSION[SESSION_VAR_SESSION_ID];
-$wayf .= "&time=TIME";
-$wayf .= "&providerId=".GUARD_ID;
-
 // Redirect to the WAYF
-header("Location: $wayf");
+header("Location: $gpsURL");
 ?>

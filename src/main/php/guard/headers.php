@@ -17,6 +17,12 @@
 //:
 */
 
+/**
+ * headers.jsp
+ *
+ * Displays the attributes and raw SAML Response
+ */
+
 include "config.php";
 require_once "utils.php";
 
@@ -25,19 +31,28 @@ session_start();
 $sessionData = loadSession($_SESSION[SESSION_VAR_SESSION_ID]);
 
 if ($_POST[mode] == "logout") {
-	destroySession($sessionData[SESSION_VAR_SESSION_ID]);
-	unset($_SESSION[SESSION_VAR_SESSION_ID]);
-	echo "<p><center><strong>Your are logged out of the SP!</strong></center></p>";
-	return;
+  destroySession($sessionData[SESSION_VAR_SESSION_ID]);
+  unset($_SESSION[SESSION_VAR_SESSION_ID]);
+  echo "<p><center><strong>Your are logged out of the SP!</strong></center></p>";
+  return;
 }
 
-foreach (array_keys($sessionData[SESSION_VAR_ATTRIBUTES]) as $key) {
-	echo $key." = ".htmlspecialchars($sessionData[SESSION_VAR_ATTRIBUTES][$key])."<br />";
+if (!empty($sessionData[SESSION_VAR_ATTRIBUTES])) {
+  foreach (array_keys($sessionData[SESSION_VAR_ATTRIBUTES]) as $key) {
+    echo $key." = ".htmlspecialchars($sessionData[SESSION_VAR_ATTRIBUTES][$key])."<br />";
+  }
+}
+else {
+  echo "No attributes available from the IdP";
 }
 ?>
 <p>
-	<form method="post" action="">
-		<input type="submit" name="submit" value="Logout" />
-		<input type="hidden" name="mode" value="logout" />
-	</form>
+  <form method="post" action="">
+    <input type="submit" name="submit" value="Logout" />
+    <input type="hidden" name="mode" value="logout" />
+  </form>
 </p>
+<? echo "<br />SAML Response from the IdP:<br />"; ?>
+<textarea rows='40' cols='150'>
+<? echo $sessionData[SESSION_VAR_SAML_RESPONSE]; ?>
+</textarea>
