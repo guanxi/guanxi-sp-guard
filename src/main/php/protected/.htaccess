@@ -1,0 +1,5 @@
+# This is the PHP config file for a Guanxi PHP Guard. You can drop this into any directory on the
+# web server that is capable of allowing the use of overrides specified in this file.
+
+# This is the full path to the Guanxi PHP Guard
+php_value auto_prepend_file /var/WWW/site/htdocs/protected/guanxi_sp_guard/GuanxiGuard.php
