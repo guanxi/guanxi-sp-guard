@@ -221,6 +221,13 @@ public abstract class GuardBase implements Filter {
       if (request.getParameter("entityID") != null) {
         engineGPSService += "&" + "entityID" + "=" + request.getParameter("entityID");
       }
+      else {
+        // If no entityID is specified in the URL, try to use the default one
+        if ((guardConfig.getGuardInfo().getDefaultEntityID() != null) &&
+            (!guardConfig.getGuardInfo().getDefaultEntityID().equals(""))) {
+          engineGPSService += "&" + "entityID" + "=" + guardConfig.getGuardInfo().getDefaultEntityID();
+        }
+      }
 
       ((HttpServletResponse)response).sendRedirect(engineGPSService);
     }
