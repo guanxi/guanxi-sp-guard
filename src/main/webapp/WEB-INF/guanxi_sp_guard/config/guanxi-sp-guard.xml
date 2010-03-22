@@ -3,6 +3,9 @@
     <HostName>protectedapp.uni.ac.uk</HostName>
     <ID>protectedapp-guard</ID>
     <AttributePrefix>HTTP_</AttributePrefix>
+    <!--
+    <DefaultEntityID>ENTITYID_OF_IDP</DefaultEntityID>
+    -->
   </GuardInfo>
 
   <Cookie>
