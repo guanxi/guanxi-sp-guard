@@ -16,8 +16,9 @@
 
 package org.guanxi.sp.guard;
 
-import org.guanxi.common.*;
-import org.guanxi.common.definitions.Guanxi;
+import org.guanxi.common.Bag;
+import org.guanxi.common.GuanxiException;
+import org.guanxi.common.Pod;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletOutputStream;
@@ -74,7 +75,7 @@ public class AttributeConsumer extends HttpServlet {
   }
 
   private Bag getBag(HttpServletRequest request) throws GuanxiException {
-    String json = request.getParameter(Guanxi.REQUEST_PARAMETER_SAML_ATTRIBUTES);
+    String json = request.getParameter(Definitions.REQUEST_PARAMETER_SAML_ATTRIBUTES);
     if (json != null) {
       return new Bag(json);
     }

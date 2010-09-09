@@ -17,7 +17,6 @@
 package org.guanxi.sp.guard;
 
 import org.guanxi.common.Pod;
-import org.guanxi.common.definitions.Guanxi;
 import org.guanxi.common.filters.FileName;
 import org.apache.log4j.Logger;
 
@@ -27,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 /**
  * Adds a Pod full of attributes to the system
@@ -39,21 +39,21 @@ public class Podder extends HttpServlet {
   private static final Logger logger = Logger.getLogger(Podder.class.getName());
 
   /** The config object placed in the servlet context by the Guard filter */
-  private org.guanxi.xal.sp.GuardDocument.Guard config = null;
+  private ResourceBundle config = null;
   /** The age of the cookie to set */
   private int cookieAge;
 
   public void init() throws ServletException {
 
     // Get the config
-    config = (org.guanxi.xal.sp.GuardDocument.Guard)getServletContext().getAttribute(Guanxi.CONTEXT_ATTR_GUARD_CONFIG);
+    config = (ResourceBundle)getServletContext().getAttribute(Definitions.CONTEXT_ATTR_GUARD_CONFIG);
 
     if (config == null)
       throw new ServletException("Podder can't get config");
 
     // Sort out the cookie's age
-    String cookieMaxAge = config.getCookie().getAge().getStringValue();
-    String cookieAgeUnits = config.getCookie().getAge().getUnits().toString();
+    String cookieMaxAge = config.getString("cookie.age");
+    String cookieAgeUnits = config.getString("cookie.age.units");
     if (cookieAgeUnits.equals("seconds"))
       cookieAge = Integer.parseInt(cookieMaxAge);
     else if (cookieAgeUnits.equals("minutes"))
@@ -99,9 +99,9 @@ public class Podder extends HttpServlet {
    */
   public void process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     // Sort out the cookie path
-    String cookieDomain = (config.getCookie().getDomain() == null) ? "" : postProcessGetGuardId(config.getCookie().getDomain(),request);
+    String cookieDomain = (config.getString("cookie.domain") == null) ? "" : postProcessGetGuardId(config.getString("cookie.domain"), request);
 
-    String cookieName = config.getCookie().getPrefix() + FileName.encode(postProcessGetGuardId(config.getGuardInfo().getID(),request));
+    String cookieName = config.getString("cookie.prefix") + FileName.encode(postProcessGetGuardId(config.getString("entityid"), request));
 
     // "id" is the sessionID set by the Guard filter
     Pod pod = (Pod)getServletContext().getAttribute(request.getParameter("id"));
@@ -111,7 +111,7 @@ public class Podder extends HttpServlet {
     Cookie cookie = new Cookie(cookieName,
                                pod.getSessionID());
     cookie.setDomain(cookieDomain);
-    cookie.setPath(config.getCookie().getPath());
+    cookie.setPath(config.getString("cookie.path"));
 
     // If cookieAge is -1, don't set the MaxAge so we get a transient, in-memory cookie
     if (cookieAge != -1)

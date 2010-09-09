@@ -18,7 +18,6 @@ package org.guanxi.sp.guard;
 
 import org.apache.log4j.Logger;
 import org.guanxi.common.Pod;
-import org.guanxi.common.definitions.Guanxi;
 import org.guanxi.common.filters.FileName;
 
 import javax.servlet.ServletException;
@@ -27,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 /**
  * <p>Logout</p>
@@ -64,8 +64,8 @@ public class Logout extends HttpServlet {
    * @throws IOException if an error occurrs
    */
   public void processLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    org.guanxi.xal.sp.GuardDocument.Guard config = (org.guanxi.xal.sp.GuardDocument.Guard)getServletContext().getAttribute(Guanxi.CONTEXT_ATTR_GUARD_CONFIG);
-    String cookieName = config.getCookie().getPrefix() + FileName.encode(postProcessGetGuardId(config.getGuardInfo().getID(),request));
+    ResourceBundle config = (ResourceBundle)getServletContext().getAttribute(Definitions.CONTEXT_ATTR_GUARD_CONFIG);
+    String cookieName = config.getString("attribute.prefix") + FileName.encode(postProcessGetGuardId(config.getString("entityid"), request));
 
     boolean loggedOut = false;
     Cookie[] cookies = request.getCookies();

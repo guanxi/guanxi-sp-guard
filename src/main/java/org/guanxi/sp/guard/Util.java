@@ -16,6 +16,14 @@
 
 package org.guanxi.sp.guard;
 
+import org.guanxi.common.GuanxiException;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
+
 public class Util {
   /**
    * Determines whether an Engine is using HTTPS for any of it's endpoints
@@ -25,5 +33,37 @@ public class Util {
    */
   public static boolean isEngineSecure(String engineWAYFLocationService) {
     return engineWAYFLocationService.toLowerCase().startsWith("https");
+  }
+
+  /**
+   * Loads the Guard config file
+   *
+   * @throws GuanxiException if an error occurs
+   * @return ResourceBundle representing the Guard configuration
+   */
+  public static ResourceBundle getConfig() throws GuanxiException {
+    ResourceBundle config = null;
+    FileInputStream fis = null;
+
+    try {
+      fis = new FileInputStream(System.getProperty("config"));
+      config = new PropertyResourceBundle(fis);
+    }
+    catch(FileNotFoundException fnfe) {
+      throw new GuanxiException(fnfe);
+    }
+    catch(IOException ioe) {
+      throw new GuanxiException(ioe);
+    }
+    finally {
+      try {
+        if (fis != null) {
+          fis.close();
+        }
+      }
+      catch(IOException ioe) {}
+    }
+
+    return config;
   }
 }

@@ -16,7 +16,6 @@
 
 package org.guanxi.sp.guard;
 
-import org.guanxi.common.definitions.Guanxi;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,7 +59,7 @@ public class SessionVerifier extends HttpServlet {
    * @throws IOException if an error occurs
    */
   public void process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    String sessionID = request.getParameter(Guanxi.SESSION_VERIFIER_PARAM_SESSION_ID);
+    String sessionID = request.getParameter(Definitions.SESSION_VERIFIER_PARAM_SESSION_ID);
 
     PrintWriter out = response.getWriter();
 
@@ -69,10 +68,10 @@ public class SessionVerifier extends HttpServlet {
     	//output must be written within processExtendedVerificationAttributes
     }
     else if (getServletContext().getAttribute(sessionID) != null) {
-      out.write(Guanxi.SESSION_VERIFIER_RETURN_VERIFIED);
+      out.write(Definitions.SESSION_VERIFIER_RETURN_VERIFIED);
     }
     else {
-      out.write(Guanxi.SESSION_VERIFIER_RETURN_NOT_VERIFIED);
+      out.write(Definitions.SESSION_VERIFIER_RETURN_NOT_VERIFIED);
     }
 
     out.close();
