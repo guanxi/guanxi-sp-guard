@@ -82,11 +82,7 @@ public abstract class GuardBase implements Filter {
     filterConfig = config;
 
     // Make the config available to the rest of the Guard as an XMLBeans Guard object
-    try {
-      guardConfig = Util.getConfig();
-    }
-    catch(GuanxiException ge) {
-    }
+    guardConfig = Util.getConfig();
     filterConfig.getServletContext().setAttribute(Definitions.CONTEXT_ATTR_GUARD_CONFIG,
                                                   guardConfig);
 
