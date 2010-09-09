@@ -15,18 +15,10 @@
     <param-value>/WEB-INF/classes/log4j.properties</param-value>
   </context-param>
 
-  <listener>
-    <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
-  </listener>
-
   <!-- Guanxi Guard -->
   <filter>
     <filter-name>Guanxi Resource Guard</filter-name>
     <filter-class>org.guanxi.sp.guard.Guard</filter-class>
-    <init-param>
-      <param-name>configFile</param-name>
-      <param-value>/WEB-INF/guanxi_sp_guard/config/guanxi-sp-guard.xml</param-value>
-    </init-param>
   </filter>
 
   <!-- Hook the protected dir -->
