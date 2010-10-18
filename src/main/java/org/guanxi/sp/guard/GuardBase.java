@@ -16,7 +16,6 @@
 
 package org.guanxi.sp.guard;
 
-import org.guanxi.common.GuanxiException;
 import org.guanxi.common.Pod;
 import org.guanxi.common.filters.FileName;
 import org.apache.log4j.Logger;
@@ -27,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.*;
 import java.io.IOException;
 import java.rmi.server.UID;
-import java.util.ResourceBundle;
 
 /**
  * Base class for Guards
@@ -40,7 +38,7 @@ public abstract class GuardBase implements Filter {
   /** This Filter's config object as set by the container */
   protected FilterConfig filterConfig = null;
   /** The Guard's config */
-  protected ResourceBundle guardConfig = null;
+  protected GuardConfig guardConfig = null;
   /** The name of the cookie the Guard uses to store a Pod of attributes */
   protected String cookieName = null;
 
@@ -82,7 +80,7 @@ public abstract class GuardBase implements Filter {
     filterConfig = config;
 
     // Make the config available to the rest of the Guard as an XMLBeans Guard object
-    guardConfig = Util.getConfig();
+    guardConfig = new GuardConfig(config.getServletContext().getRealPath("/WEB-INF/guanxi_sp_guard/config/guanxi-sp-guard.properties"));
     filterConfig.getServletContext().setAttribute(Definitions.CONTEXT_ATTR_GUARD_CONFIG,
                                                   guardConfig);
 
@@ -90,14 +88,14 @@ public abstract class GuardBase implements Filter {
      * to allow applications to know who their Guard is.
      */
     filterConfig.getServletContext().setAttribute(Definitions.CONTEXT_ATTR_GUARD_ID,
-                                                  guardConfig.getString("entityid"));
+                                                  guardConfig.get("entityid"));
     filterConfig.getServletContext().setAttribute(Definitions.CONTEXT_ATTR_GUARD_COOKIE_PREFIX,
-                                                  guardConfig.getString("cookie.prefix"));
+                                                  guardConfig.get("cookie.prefix"));
     filterConfig.getServletContext().setAttribute(Definitions.CONTEXT_ATTR_GUARD_COOKIE_NAME,
-                                                  guardConfig.getString("cookie.prefix") + guardConfig.getString("entityid"));
+                                                  guardConfig.get("cookie.prefix") + guardConfig.get("entityid"));
 
     // The cookie name can be changed at runtime
-    cookieName = guardConfig.getString("cookie.prefix") + FileName.encode(guardConfig.getString("entityid"));
+    cookieName = guardConfig.get("cookie.prefix") + FileName.encode(guardConfig.get("entityid"));
   }
 
   /**
@@ -199,19 +197,19 @@ public abstract class GuardBase implements Filter {
 
   protected void gotoEngineGPS(String sessionID, ServletRequest request, ServletResponse response) {
     try {
-      ResourceBundle config = (ResourceBundle)filterConfig.getServletContext().getAttribute(Definitions.CONTEXT_ATTR_GUARD_CONFIG);
+      GuardConfig config = (GuardConfig)filterConfig.getServletContext().getAttribute(Definitions.CONTEXT_ATTR_GUARD_CONFIG);
 
-      String engineGPSService = config.getString("engine.gps.service.url");
-      engineGPSService += "?" + Definitions.WAYF_PARAM_GUARD_ID + "=" + config.getString("entityid");
+      String engineGPSService = config.get("engine.gps.service.url");
+      engineGPSService += "?" + Definitions.WAYF_PARAM_GUARD_ID + "=" + config.get("entityid");
       engineGPSService += "&" + Definitions.WAYF_PARAM_SESSION_ID + "=" + sessionID;
       if (request.getParameter("entityID") != null) {
         engineGPSService += "&" + "entityID" + "=" + request.getParameter("entityID");
       }
       else {
         // If no entityID is specified in the URL, try to use the default one
-        if ((config.getString("default.entity.id") != null) &&
-            (!config.getString("default.entity.id").equals(""))) {
-          engineGPSService += "&" + "entityID" + "=" + config.getString("default.entity.id");
+        if ((config.get("default.entity.id") != null) &&
+            (!config.get("default.entity.id").equals(""))) {
+          engineGPSService += "&" + "entityID" + "=" + config.get("default.entity.id");
         }
       }
 
