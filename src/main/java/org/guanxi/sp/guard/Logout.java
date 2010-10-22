@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import java.io.IOException;
-import java.util.ResourceBundle;
 
 /**
  * <p>Logout</p>
@@ -64,8 +63,8 @@ public class Logout extends HttpServlet {
    * @throws IOException if an error occurrs
    */
   public void processLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    ResourceBundle config = (ResourceBundle)getServletContext().getAttribute(Definitions.CONTEXT_ATTR_GUARD_CONFIG);
-    String cookieName = config.getString("attribute.prefix") + FileName.encode(postProcessGetGuardId(config.getString("entityid"), request));
+    GuardConfig config = (GuardConfig)getServletContext().getAttribute(Definitions.CONTEXT_ATTR_GUARD_CONFIG);
+    String cookieName = config.get("attribute.prefix") + FileName.encode(postProcessGetGuardId(config.get("entityid"), request));
 
     boolean loggedOut = false;
     Cookie[] cookies = request.getCookies();
