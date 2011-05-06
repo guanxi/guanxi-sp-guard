@@ -90,7 +90,13 @@ public class Logout extends HttpServlet {
     if (!loggedOut)
       request.setAttribute(getLogoutMessageAttributeName(), getLogoutErrorMessage());
 
-    request.getRequestDispatcher(getLogoutResource()).forward(request, response);
+    // See if we have to redirect anywhere after logging out
+    if ((request.getParameter("goto") != null) && (request.getParameter("goto").length() > 0)) {
+      response.sendRedirect(request.getParameter("goto"));
+    }
+    else {
+      request.getRequestDispatcher(getLogoutResource()).forward(request, response);
+    }
   }
 
   /**
