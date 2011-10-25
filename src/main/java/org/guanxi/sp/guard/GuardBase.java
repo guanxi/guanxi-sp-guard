@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.*;
 import java.io.IOException;
 import java.rmi.server.UID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Base class for Guards
@@ -80,7 +82,24 @@ public abstract class GuardBase implements Filter {
     filterConfig = config;
 
     // Make the config available to the rest of the Guard as an XMLBeans Guard object
-    guardConfig = new GuardConfig(config.getServletContext().getRealPath("/WEB-INF/guanxi_sp_guard/config/guanxi-sp-guard.properties"));
+    String configFilePath = null;
+    if ((filterConfig.getInitParameter("configFile") != null) &&
+        (filterConfig.getInitParameter("configFile").length() > 0)) {
+      Pattern pattern = Pattern.compile("^\\$\\{(.*)}(.*)");
+      Matcher matcher = pattern.matcher(filterConfig.getInitParameter("configFile"));
+      if (matcher.matches()) {
+        configFilePath = System.getenv(matcher.group(1)) + matcher.group(2);
+      }
+      else {
+        configFilePath = filterConfig.getInitParameter("configFile");
+      }
+    }
+    else {
+      configFilePath = config.getServletContext().getRealPath("/WEB-INF/guanxi_sp_guard/config/guanxi-sp-guard.properties");
+    }
+    logger.info("Setting config to " + configFilePath);
+    guardConfig = new GuardConfig(configFilePath);
+
     filterConfig.getServletContext().setAttribute(Definitions.CONTEXT_ATTR_GUARD_CONFIG,
                                                   guardConfig);
 
