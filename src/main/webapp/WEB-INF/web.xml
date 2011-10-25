@@ -19,6 +19,13 @@
   <filter>
     <filter-name>Guanxi Resource Guard</filter-name>
     <filter-class>org.guanxi.sp.guard.Guard</filter-class>
+    <!--
+    Default is /WEB-INF/guanxi_sp_guard/config/guanxi-sp-guard.properties
+    <init-param>
+      <param-name>configFile</param-name>
+      <param-value>${GUANXI_HOME}/config/guanxi_sp_guard/guanxi-sp-guard.properties</param-value>
+    </init-param>
+    -->
   </filter>
 
   <!-- Hook the protected dir -->
