@@ -207,8 +207,35 @@ public abstract class GuardBase implements Filter {
     		(httpRequest.getRequestURI().endsWith("guard.guanxiGuardACS")) ||
     		(httpRequest.getRequestURI().endsWith(getLogoutPage(httpRequest))) ||
     		(httpRequest.getRequestURI().endsWith("guard.guanxiGuardPodder")) ||
+        customPassThru(httpRequest) ||
     		checkSkipFilter(httpRequest)) {
       return true;
+    }
+
+      return false;
+  }
+
+  /**
+   * Determines whether a URL should get past the Guard.
+   *
+   * This is determined by the setting in guanxi-sp-guard.properties:
+   * custom.passthru.urls
+   *
+   * @param httpRequest Servlet request
+   * @return true if the URL should not be challenged otherwise false and the Guard
+   * logic is invoked
+   */
+  protected boolean customPassThru(HttpServletRequest httpRequest) {
+    GuardConfig config = (GuardConfig)filterConfig.getServletContext().getAttribute(Definitions.CONTEXT_ATTR_GUARD_CONFIG);
+    if (config.get("custom.passthru.urls") == null) return false;
+
+    String[] customPassThruURLs = config.get("custom.passthru.urls").split(",");
+    for (String customPassThruURL : customPassThruURLs) {
+      Pattern regex = Pattern.compile(customPassThruURL);
+      Matcher matcher = regex.matcher(httpRequest.getServletPath());
+      if (matcher.find()) {
+        return true;
+      }
     }
 
     return false;
