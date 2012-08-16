@@ -14,7 +14,7 @@
   <name>guanxi-sp-guard</name>
   <groupId>org.guanxi</groupId>
   <artifactId>guanxi-sp-guard</artifactId>
-  <version>3.0.3</version>
+  <version>3.0.4-SNAPSHOT</version>
 
   <organization>
     <name>UHI Millennium Institute</name>
