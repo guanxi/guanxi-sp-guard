@@ -14,7 +14,7 @@
   <name>guanxi-sp-guard</name>
   <groupId>org.guanxi</groupId>
   <artifactId>guanxi-sp-guard</artifactId>
-  <version>3.0.4-SNAPSHOT</version>
+  <version>3.0.4</version>
 
   <organization>
     <name>UHI Millennium Institute</name>
@@ -82,15 +82,8 @@
               <goal>deploy-file</goal>
             </goals>
             <configuration>
-              <!-- For SNAPSHOT, use this deployment -->
-              <repositoryId>source.uhi.ac.uk-snapshot-repository</repositoryId>
-              <url>http://source.uhi.ac.uk/snapshots</url>
-
-              <!-- For release, use this deployment -->
-              <!--
               <repositoryId>source.uhi.ac.uk-repository</repositoryId>
               <url>http://source.uhi.ac.uk/mvn</url>
-              -->
               <packaging>jar</packaging>
               <artifactId>${project.artifactId}</artifactId>
               <groupId>${project.groupId}</groupId>
